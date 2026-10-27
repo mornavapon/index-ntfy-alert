@@ -1,3 +1,4 @@
+
 name: Test Yahoo Finance index data
 
 on:
@@ -8,10 +9,6 @@ on:
 permissions:
   contents: read
 
-concurrency:
-  group: yahoo-index-data-probe
-  cancel-in-progress: true
-
 jobs:
   check-index-data:
     runs-on: ubuntu-latest
@@ -19,12 +16,14 @@ jobs:
     steps:
       - name: Check out repository
         uses: actions/checkout@v4
+
       - name: Set up Python
         uses: actions/setup-python@v5
         with:
           python-version: "3.12"
-          cache: pip
+
       - name: Install dependencies
         run: python -m pip install -r requirements.txt
+
       - name: Check index data
-        run: python scripts/test_yahoo_indices.py
+        run: python test_yahoo_indices.py
