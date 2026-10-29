@@ -22,7 +22,7 @@
         "40": false
       },
       "initial_alerts_sent": true,
-      "updated_utc": "2026-10-29T08:01:09.680081+00:00"
+      "updated_utc": "2026-10-29T08:03:38.102490+00:00"
     },
     "^IXIC": {
       "initialized": true,
@@ -44,7 +44,7 @@
         "40": false
       },
       "initial_alerts_sent": true,
-      "updated_utc": "2026-10-29T08:01:10.751284+00:00"
+      "updated_utc": "2026-10-29T08:03:39.204687+00:00"
     },
     "^DJI": {
       "initialized": true,
@@ -66,7 +66,7 @@
         "40": false
       },
       "initial_alerts_sent": true,
-      "updated_utc": "2026-10-29T08:01:11.822410+00:00"
+      "updated_utc": "2026-10-29T08:03:40.345851+00:00"
     },
     "^HSI": {
       "initialized": true,
@@ -74,7 +74,7 @@
       "ath_close": 33154.12109375,
       "ath_date": "2018-01-26",
       "last_date": "2026-10-29",
-      "last_close": 22978.810546875,
+      "last_close": 22960.890625,
       "ath_alerts": {
         "10": true,
         "20": true,
@@ -88,7 +88,7 @@
         "40": false
       },
       "initial_alerts_sent": true,
-      "updated_utc": "2026-10-29T08:01:13.065119+00:00"
+      "updated_utc": "2026-10-29T08:03:41.458120+00:00"
     }
   }
 }
