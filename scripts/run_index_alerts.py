@@ -18,15 +18,18 @@ INDICES = {
     "^HSI": "Hang Seng Index",
 }
 
+# Yahoo Finance does not provide usable daily history for every index
+# starting in the same year. These are conservative starting years.
+HISTORY_START_YEARS = {
+    "^GSPC": 1970,
+    "^IXIC": 1970,
+    "^DJI": 1985,
+    "^HSI": 1986,
+}
+
 BASE_URL = "https://query1.finance.yahoo.com/v8/finance/chart/{}"
-HEADERS = {"User-Agent": "Mozilla/5.0 IndexAlert/2.0"}
-
+HEADERS = {"User-Agent": "Mozilla/5.0 IndexAlert/2.1"}
 STATE_PATH = Path("data/alert_state.json")
-
-# Start at 1970 to avoid Yahoo rejecting negative Unix timestamps.
-# Therefore the ATH calculation means the highest close found since 1970,
-# not a guaranteed all-time high for every index.
-HISTORY_START_YEAR = 1970
 CHUNK_YEARS = 5
 THRESHOLDS = (10, 20, 30, 40)
 RECENT_DAYS = 5 * 366
@@ -37,7 +40,7 @@ def now_utc():
 
 
 def fetch_chunk(session, symbol, start, end):
-    """Fetch daily closing prices for a date interval."""
+    """Fetch daily closing prices for [start, end)."""
     url = BASE_URL.format(requests.utils.quote(symbol, safe=""))
 
     response = session.get(
@@ -80,45 +83,44 @@ def fetch_chunk(session, symbol, start, end):
     rows = []
     for timestamp, close in zip(timestamps, closes):
         if isinstance(close, (int, float)) and close > 0:
-            date = datetime.fromtimestamp(
+            day = datetime.fromtimestamp(
                 timestamp, timezone.utc
             ).date().isoformat()
-            rows.append((date, float(close)))
+            rows.append((day, float(close)))
 
     return rows
 
 
 def fetch_recent_history(session, symbol):
-    """Fetch recent data for 52-week highs and current drawdowns."""
+    """Fetch recent data for current drawdowns and 52-week highs."""
     end = now_utc()
     start = datetime.fromtimestamp(
         end.timestamp() - RECENT_DAYS * 86400,
         timezone.utc,
     )
 
-    rows = fetch_chunk(session, symbol, start, end)
-    rows = sorted(dict(rows).items())
+    rows = sorted(dict(fetch_chunk(session, symbol, start, end)).items())
 
-    if len(rows) < 200:
+    if len(rows) < 253:
         raise RuntimeError(
             f"Too few recent daily closes for {symbol}: {len(rows)}"
         )
 
-    latest_date = datetime.fromisoformat(rows[-1][0]).date()
-    age_days = (now_utc().date() - latest_date).days
+    latest_day = datetime.fromisoformat(rows[-1][0]).date()
+    age_days = (now_utc().date() - latest_day).days
 
     if age_days > 7:
         raise RuntimeError(
-            f"Latest close is stale for {symbol}: {latest_date}"
+            f"Latest close is stale for {symbol}: {latest_day}"
         )
 
     return rows
 
 
-def fetch_history_since_1970(session, symbol):
-    """Build the longest usable history available from 1970 onward."""
+def fetch_historical_data(session, symbol, start_year):
+    """Fetch history in chunks, starting at the symbol-specific year."""
     current_year = now_utc().year
-    year = HISTORY_START_YEAR
+    year = start_year
     prices = {}
     found_data = False
 
@@ -133,11 +135,10 @@ def fetch_history_since_1970(session, symbol):
             found_data = True
             prices.update(chunk)
         elif found_data:
-            # A missing chunk after data began could mean a historical gap.
             raise RuntimeError(
                 f"Missing historical data for {symbol}: "
                 f"{year}-{next_year - 1}. "
-                "Stopping to avoid claiming an unreliable ATH."
+                "Stopping to avoid an unreliable historical maximum."
             )
 
         year = next_year
@@ -145,7 +146,7 @@ def fetch_history_since_1970(session, symbol):
 
     rows = sorted(prices.items())
 
-    if len(rows) < 200:
+    if len(rows) < 253:
         raise RuntimeError(
             f"Not enough historical closes for {symbol}: {len(rows)}"
         )
@@ -179,7 +180,6 @@ def save_state(state):
 
 
 def send_ntfy(session, topic, token, title, message, priority="default"):
-    # Keep HTTP header values ASCII-safe. Thai text belongs in the body.
     headers = {
         "Title": title,
         "Tags": "chart_with_downwards_trend",
@@ -196,11 +196,10 @@ def send_ntfy(session, topic, token, title, message, priority="default"):
         timeout=25,
     )
     response.raise_for_status()
-
     print(f"NOTIFIED | {title} | HTTP {response.status_code}")
 
 
-def flags_for(drawdown):
+def threshold_flags(drawdown):
     return {
         str(level): drawdown <= -level
         for level in THRESHOLDS
@@ -208,21 +207,22 @@ def flags_for(drawdown):
 
 
 def process_index(session, topic, token, state, symbol, name):
+    start_year = HISTORY_START_YEARS[symbol]
     saved = state["indices"].get(symbol, {})
 
-    # Rebuild the baseline when the previous state was created by an older
-    # script version that did not explicitly record the 1970 history start.
+    # Rebuild the baseline if this index has no state or its baseline year
+    # differs from the current configuration.
     needs_baseline = (
         not saved.get("initialized", False)
-        or saved.get("ath_start_year") != HISTORY_START_YEAR
+        or saved.get("ath_start_year") != start_year
     )
 
     if needs_baseline:
         print(
             f"INFO | {name} | Building historical baseline "
-            f"from {HISTORY_START_YEAR}..."
+            f"from {start_year}..."
         )
-        rows = fetch_history_since_1970(session, symbol)
+        rows = fetch_historical_data(session, symbol, start_year)
         ath_date, ath_close = max(rows, key=lambda item: item[1])
         is_baseline_run = True
     else:
@@ -238,12 +238,10 @@ def process_index(session, topic, token, state, symbol, name):
 
     latest_date, latest_close = rows[-1]
 
-    # Compare the latest close with the preceding 252 trading sessions.
+    # Compare the latest close against the preceding 252 trading sessions.
     previous_window = rows[-253:-1]
-    if len(previous_window) < 200:
-        raise RuntimeError(
-            f"Insufficient 52-week history for {symbol}"
-        )
+    if len(previous_window) < 252:
+        raise RuntimeError(f"Insufficient 52-week history for {symbol}")
 
     high_52w_date, high_52w = max(
         previous_window, key=lambda item: item[1]
@@ -255,18 +253,18 @@ def process_index(session, topic, token, state, symbol, name):
     print(
         f"PASS | {name} | close date={latest_date} "
         f"| close={latest_close:.2f} "
-        f"| highest close since {HISTORY_START_YEAR}="
+        f"| highest close since {start_year}="
         f"{ath_close:.2f} ({ath_date}) "
         f"| previous 52-week high={high_52w:.2f} "
         f"({high_52w_date}) "
         f"| drawdown={dd_ath:.2f}% / {dd_52w:.2f}%"
     )
 
-    new_ath_flags = flags_for(dd_ath)
-    new_52w_flags = flags_for(dd_52w)
+    new_ath_flags = threshold_flags(dd_ath)
+    new_52w_flags = threshold_flags(dd_52w)
     previous_date = saved.get("last_date")
 
-    # Baseline creation intentionally sends no historical threshold alerts.
+    # First run establishes a baseline without sending historical alerts.
     if not is_baseline_run and latest_date != previous_date:
         old_ath_flags = saved.get("ath_alerts", {})
         old_52w_flags = saved.get("52w_alerts", {})
@@ -284,7 +282,7 @@ def process_index(session, topic, token, state, symbol, name):
                     token,
                     "Index Alert",
                     f"{name}: ราคาปิดลดลง {dd_ath:.2f}% "
-                    f"จากจุดสูงสุดที่พบตั้งแต่ {HISTORY_START_YEAR} "
+                    f"จากจุดสูงสุดที่พบตั้งแต่ {start_year} "
                     f"({ath_close:.2f})\n"
                     f"วันที่ข้อมูล: {latest_date}\n"
                     f"ถึงระดับแจ้งเตือน -{level}%",
@@ -307,7 +305,6 @@ def process_index(session, topic, token, state, symbol, name):
                     priority="high",
                 )
 
-        # New 52-week high relative to the previous 252 closes.
         if latest_close > high_52w:
             send_ntfy(
                 session,
@@ -321,7 +318,7 @@ def process_index(session, topic, token, state, symbol, name):
 
     state["indices"][symbol] = {
         "initialized": True,
-        "ath_start_year": HISTORY_START_YEAR,
+        "ath_start_year": start_year,
         "ath_close": ath_close,
         "ath_date": ath_date,
         "last_date": latest_date,
@@ -344,10 +341,12 @@ def main():
 
     print("Index Alert starting")
     print(f"UTC time: {now_utc().isoformat()}")
-    print(f"Historical baseline begins in {HISTORY_START_YEAR}.")
+    print("Historical baseline years:")
+    for symbol, name in INDICES.items():
+        print(f"  {name}: from {HISTORY_START_YEARS[symbol]}")
     print(
-        "Note: historical maximum means highest close found "
-        "since 1970, not guaranteed all-time high."
+        "Historical maximum means the highest close found since "
+        "the configured start year, not a guaranteed all-time high."
     )
     print("-" * 72)
 
