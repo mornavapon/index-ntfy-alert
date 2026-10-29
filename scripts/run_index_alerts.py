@@ -18,8 +18,6 @@ INDICES = {
     "^HSI": "Hang Seng Index",
 }
 
-# Yahoo Finance does not provide usable daily history for every index
-# starting in the same year. These are conservative starting years.
 HISTORY_START_YEARS = {
     "^GSPC": 1970,
     "^IXIC": 1970,
@@ -28,7 +26,7 @@ HISTORY_START_YEARS = {
 }
 
 BASE_URL = "https://query1.finance.yahoo.com/v8/finance/chart/{}"
-HEADERS = {"User-Agent": "Mozilla/5.0 IndexAlert/2.1"}
+HEADERS = {"User-Agent": "Mozilla/5.0 IndexAlert/2.2"}
 STATE_PATH = Path("data/alert_state.json")
 CHUNK_YEARS = 5
 THRESHOLDS = (10, 20, 30, 40)
@@ -40,7 +38,6 @@ def now_utc():
 
 
 def fetch_chunk(session, symbol, start, end):
-    """Fetch daily closing prices for [start, end)."""
     url = BASE_URL.format(requests.utils.quote(symbol, safe=""))
 
     response = session.get(
@@ -92,7 +89,6 @@ def fetch_chunk(session, symbol, start, end):
 
 
 def fetch_recent_history(session, symbol):
-    """Fetch recent data for current drawdowns and 52-week highs."""
     end = now_utc()
     start = datetime.fromtimestamp(
         end.timestamp() - RECENT_DAYS * 86400,
@@ -118,7 +114,7 @@ def fetch_recent_history(session, symbol):
 
 
 def fetch_historical_data(session, symbol, start_year):
-    """Fetch history in chunks, starting at the symbol-specific year."""
+    """Skip HTTP 400 ranges only before the first usable data."""
     current_year = now_utc().year
     year = start_year
     prices = {}
@@ -129,7 +125,25 @@ def fetch_historical_data(session, symbol, start_year):
         start = datetime(year, 1, 1, tzinfo=timezone.utc)
         end = datetime(next_year, 1, 1, tzinfo=timezone.utc)
 
-        chunk = fetch_chunk(session, symbol, start, end)
+        try:
+            chunk = fetch_chunk(session, symbol, start, end)
+        except requests.HTTPError as exc:
+            status = (
+                exc.response.status_code
+                if exc.response is not None
+                else None
+            )
+
+            if status == 400 and not found_data:
+                print(
+                    f"INFO | {symbol} | Yahoo HTTP 400 for "
+                    f"{year}-{next_year - 1}; trying next range."
+                )
+                year = next_year
+                time.sleep(0.3)
+                continue
+
+            raise
 
         if chunk:
             found_data = True
@@ -139,6 +153,11 @@ def fetch_historical_data(session, symbol, start_year):
                 f"Missing historical data for {symbol}: "
                 f"{year}-{next_year - 1}. "
                 "Stopping to avoid an unreliable historical maximum."
+            )
+        else:
+            print(
+                f"INFO | {symbol} | No data for "
+                f"{year}-{next_year - 1}; trying next range."
             )
 
         year = next_year
@@ -210,8 +229,6 @@ def process_index(session, topic, token, state, symbol, name):
     start_year = HISTORY_START_YEARS[symbol]
     saved = state["indices"].get(symbol, {})
 
-    # Rebuild the baseline if this index has no state or its baseline year
-    # differs from the current configuration.
     needs_baseline = (
         not saved.get("initialized", False)
         or saved.get("ath_start_year") != start_year
@@ -238,7 +255,6 @@ def process_index(session, topic, token, state, symbol, name):
 
     latest_date, latest_close = rows[-1]
 
-    # Compare the latest close against the preceding 252 trading sessions.
     previous_window = rows[-253:-1]
     if len(previous_window) < 252:
         raise RuntimeError(f"Insufficient 52-week history for {symbol}")
@@ -264,7 +280,6 @@ def process_index(session, topic, token, state, symbol, name):
     new_52w_flags = threshold_flags(dd_52w)
     previous_date = saved.get("last_date")
 
-    # First run establishes a baseline without sending historical alerts.
     if not is_baseline_run and latest_date != previous_date:
         old_ath_flags = saved.get("ath_alerts", {})
         old_52w_flags = saved.get("52w_alerts", {})
