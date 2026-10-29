@@ -10,19 +10,21 @@
       "last_date": "2026-10-28",
       "last_close": 7743.97998046875,
       "ath_alerts": {
+        "5": false,
         "10": false,
         "20": false,
         "30": false,
         "40": false
       },
       "52w_alerts": {
+        "5": false,
         "10": false,
         "20": false,
         "30": false,
         "40": false
       },
       "initial_alerts_sent": true,
-      "updated_utc": "2026-10-29T08:03:38.102490+00:00"
+      "updated_utc": "2026-10-29T08:22:55.417836+00:00"
     },
     "^IXIC": {
       "initialized": true,
@@ -32,19 +34,21 @@
       "last_date": "2026-10-28",
       "last_close": 26549.849609375,
       "ath_alerts": {
+        "5": false,
         "10": false,
         "20": false,
         "30": false,
         "40": false
       },
       "52w_alerts": {
+        "5": false,
         "10": false,
         "20": false,
         "30": false,
         "40": false
       },
       "initial_alerts_sent": true,
-      "updated_utc": "2026-10-29T08:03:39.204687+00:00"
+      "updated_utc": "2026-10-29T08:22:56.493847+00:00"
     },
     "^DJI": {
       "initialized": true,
@@ -54,19 +58,21 @@
       "last_date": "2026-10-28",
       "last_close": 52475.1015625,
       "ath_alerts": {
+        "5": false,
         "10": false,
         "20": false,
         "30": false,
         "40": false
       },
       "52w_alerts": {
+        "5": false,
         "10": false,
         "20": false,
         "30": false,
         "40": false
       },
       "initial_alerts_sent": true,
-      "updated_utc": "2026-10-29T08:03:40.345851+00:00"
+      "updated_utc": "2026-10-29T08:22:57.566360+00:00"
     },
     "^HSI": {
       "initialized": true,
@@ -74,21 +80,23 @@
       "ath_close": 33154.12109375,
       "ath_date": "2018-01-26",
       "last_date": "2026-10-29",
-      "last_close": 22960.890625,
+      "last_close": 22941.169921875,
       "ath_alerts": {
+        "5": true,
         "10": true,
         "20": true,
         "30": true,
         "40": false
       },
       "52w_alerts": {
+        "5": true,
         "10": true,
         "20": false,
         "30": false,
         "40": false
       },
       "initial_alerts_sent": true,
-      "updated_utc": "2026-10-29T08:03:41.458120+00:00"
+      "updated_utc": "2026-10-29T08:22:58.627417+00:00"
     }
   }
 }
