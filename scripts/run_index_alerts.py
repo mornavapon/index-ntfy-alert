@@ -26,7 +26,7 @@ HISTORY_START_YEARS = {
 }
 
 BASE_URL = "https://query1.finance.yahoo.com/v8/finance/chart/{}"
-HEADERS = {"User-Agent": "Mozilla/5.0 IndexAlert/2.2"}
+HEADERS = {"User-Agent": "Mozilla/5.0 IndexAlert/2.3"}
 STATE_PATH = Path("data/alert_state.json")
 CHUNK_YEARS = 5
 THRESHOLDS = (10, 20, 30, 40)
@@ -280,7 +280,14 @@ def process_index(session, topic, token, state, symbol, name):
     new_52w_flags = threshold_flags(dd_52w)
     previous_date = saved.get("last_date")
 
-    if not is_baseline_run and latest_date != previous_date:
+    # First run after this upgrade sends any currently active thresholds.
+    # This also handles indices whose baseline was saved by an older version.
+    initial_alerts_sent = saved.get("initial_alerts_sent", False)
+    should_check_thresholds = (
+        latest_date != previous_date or not initial_alerts_sent
+    )
+
+    if should_check_thresholds:
         old_ath_flags = saved.get("ath_alerts", {})
         old_52w_flags = saved.get("52w_alerts", {})
 
@@ -289,7 +296,10 @@ def process_index(session, topic, token, state, symbol, name):
 
             if (
                 new_ath_flags[key]
-                and not old_ath_flags.get(key, False)
+                and (
+                    not old_ath_flags.get(key, False)
+                    or not initial_alerts_sent
+                )
             ):
                 send_ntfy(
                     session,
@@ -306,7 +316,10 @@ def process_index(session, topic, token, state, symbol, name):
 
             if (
                 new_52w_flags[key]
-                and not old_52w_flags.get(key, False)
+                and (
+                    not old_52w_flags.get(key, False)
+                    or not initial_alerts_sent
+                )
             ):
                 send_ntfy(
                     session,
@@ -320,16 +333,21 @@ def process_index(session, topic, token, state, symbol, name):
                     priority="high",
                 )
 
-        if latest_close > high_52w:
-            send_ntfy(
-                session,
-                topic,
-                token,
-                "Index Alert",
-                f"{name}: ทำจุดสูงสุดใหม่ในรอบ 52 สัปดาห์\n"
-                f"ราคาปิด: {latest_close:.2f}\n"
-                f"วันที่ข้อมูล: {latest_date}",
-            )
+    # Keep the existing new-52-week-high alert behavior.
+    if (
+        not is_baseline_run
+        and latest_date != previous_date
+        and latest_close > high_52w
+    ):
+        send_ntfy(
+            session,
+            topic,
+            token,
+            "Index Alert",
+            f"{name}: ทำจุดสูงสุดใหม่ในรอบ 52 สัปดาห์\n"
+            f"ราคาปิด: {latest_close:.2f}\n"
+            f"วันที่ข้อมูล: {latest_date}",
+        )
 
     state["indices"][symbol] = {
         "initialized": True,
@@ -340,6 +358,7 @@ def process_index(session, topic, token, state, symbol, name):
         "last_close": latest_close,
         "ath_alerts": new_ath_flags,
         "52w_alerts": new_52w_flags,
+        "initial_alerts_sent": True,
         "updated_utc": now_utc().isoformat(),
     }
 
