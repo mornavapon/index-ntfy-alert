@@ -283,11 +283,17 @@ def process_index(session, topic, token, state, symbol, name):
     new_52w_flags = threshold_flags(dd_52w)
     previous_date = saved.get("last_date")
 
-    # First run after this upgrade sends any currently active thresholds.
-    # This also handles indices whose baseline was saved by an older version.
     initial_alerts_sent = saved.get("initial_alerts_sent", False)
+
+    # ตรวจระดับ -5% เพิ่มอีกครั้ง หากยังไม่เคยตรวจด้วยกติกาใหม่นี้
+    five_percent_check_pending = not saved.get(
+        "five_percent_alert_checked", False
+    )
+
     should_check_thresholds = (
-        latest_date != previous_date or not initial_alerts_sent
+        latest_date != previous_date
+        or not initial_alerts_sent
+        or five_percent_check_pending
     )
 
     if should_check_thresholds:
@@ -297,10 +303,16 @@ def process_index(session, topic, token, state, symbol, name):
         for level in THRESHOLDS:
             key = str(level)
 
+            # บังคับตรวจระดับ -5% เพียงครั้งแรกหลังอัปเดต
+            force_five_percent_check = (
+                level == 5 and five_percent_check_pending
+            )
+
             if (
                 new_ath_flags[key]
                 and (
-                    not old_ath_flags.get(key, False)
+                    force_five_percent_check
+                    or not old_ath_flags.get(key, False)
                     or not initial_alerts_sent
                 )
             ):
@@ -320,7 +332,8 @@ def process_index(session, topic, token, state, symbol, name):
             if (
                 new_52w_flags[key]
                 and (
-                    not old_52w_flags.get(key, False)
+                    force_five_percent_check
+                    or not old_52w_flags.get(key, False)
                     or not initial_alerts_sent
                 )
             ):
@@ -362,6 +375,7 @@ def process_index(session, topic, token, state, symbol, name):
         "ath_alerts": new_ath_flags,
         "52w_alerts": new_52w_flags,
         "initial_alerts_sent": True,
+        "five_percent_alert_checked": True,
         "updated_utc": now_utc().isoformat(),
     }
 
