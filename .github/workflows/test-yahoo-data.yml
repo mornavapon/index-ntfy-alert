@@ -1,5 +1,5 @@
 
-name: Test Yahoo Finance index data
+name: Index alerts
 
 on:
   workflow_dispatch:
@@ -7,12 +7,17 @@ on:
     - cron: "30 1 * * 1-6"
 
 permissions:
-  contents: read
+  contents: write
+
+concurrency:
+  group: index-alerts
+  cancel-in-progress: false
 
 jobs:
   check-index-data:
     runs-on: ubuntu-latest
-    timeout-minutes: 5
+    timeout-minutes: 20
+
     steps:
       - name: Check out repository
         uses: actions/checkout@v4
@@ -40,10 +45,7 @@ jobs:
           token = os.environ.get("NTFY_TOKEN", "").strip()
 
           if not topic:
-              raise SystemExit(
-                  "ERROR: NTFY_TOPIC secret is missing. "
-                  "Check Settings > Secrets and variables > Actions."
-              )
+              raise SystemExit("ERROR: Missing NTFY_TOPIC secret.")
 
           headers = {
               "Title": "Index Alert Test",
@@ -54,11 +56,10 @@ jobs:
               headers["Authorization"] = f"Bearer {token}"
 
           message = (
-              "แจ้งเตือนบนมือถือได้แล้ว! ระบบ Index Alert "
-              "เชื่อมต่อ ntfy สำเร็จ "
+              "แจ้งเตือนบนมือถือได้แล้ว! ระบบ Index Alert เชื่อมต่อ ntfy สำเร็จ "
               f"เวลา {datetime.now(timezone.utc).strftime('%Y-%m-%d %H:%M UTC')}\n"
-              "หากไม่มีข้อความแจ้งเตือนดัชนีเพิ่มเติม "
-              "แปลว่าวันนี้ยังไม่มีเงื่อนไขที่ถึงระดับแจ้งเตือน"
+              "กำลังตรวจสอบข้อมูลดัชนีหุ้น หากไม่มีข้อความอื่น "
+              "อาจหมายถึงยังไม่มีเงื่อนไขแจ้งเตือน"
           )
 
           response = requests.post(
@@ -68,11 +69,24 @@ jobs:
               timeout=20,
           )
           response.raise_for_status()
-
           print("PASS: ntfy accepted the test notification.")
-          print(f"HTTP status: {response.status_code}")
-          print("Please check the ntfy mobile app.")
           PY
 
-      - name: Check index data
-        run: python test_yahoo_indices.py
+      - name: Run index alerts
+        env:
+          NTFY_TOPIC: ${{ secrets.NTFY_TOPIC }}
+          NTFY_TOKEN: ${{ secrets.NTFY_TOKEN }}
+        run: python scripts/run_index_alerts.py
+
+      - name: Save alert state
+        if: success()
+        run: |
+          if [[ -n "$(git status --porcelain data/alert_state.json)" ]]; then
+            git config user.name "github-actions[bot]"
+            git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+            git add data/alert_state.json
+            git commit -m "Update index alert state"
+            git push
+          else
+            echo "Alert state unchanged."
+          fi
