@@ -29,7 +29,10 @@ BASE_URL = "https://query1.finance.yahoo.com/v8/finance/chart/{}"
 HEADERS = {"User-Agent": "Mozilla/5.0 IndexAlert/2.3"}
 STATE_PATH = Path("data/alert_state.json")
 CHUNK_YEARS = 5
-THRESHOLDS = (10, 20, 30, 40)
+
+# เพิ่มระดับ -5% สำหรับทดสอบระบบแจ้งเตือน
+THRESHOLDS = (5, 10, 20, 30, 40)
+
 RECENT_DAYS = 5 * 366
 
 
