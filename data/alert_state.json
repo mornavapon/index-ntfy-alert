@@ -1,5 +1,90 @@
 {
   "version": 1,
   "initialized": false,
-  "indices": {}
+  "indices": {
+    "^GSPC": {
+      "initialized": true,
+      "ath_start_year": 1970,
+      "ath_close": 7818.93017578125,
+      "ath_date": "2026-10-06",
+      "last_date": "2026-10-28",
+      "last_close": 7743.97998046875,
+      "ath_alerts": {
+        "10": false,
+        "20": false,
+        "30": false,
+        "40": false
+      },
+      "52w_alerts": {
+        "10": false,
+        "20": false,
+        "30": false,
+        "40": false
+      },
+      "updated_utc": "2026-10-29T07:46:13.762317+00:00"
+    },
+    "^IXIC": {
+      "initialized": true,
+      "ath_start_year": 1970,
+      "ath_close": 27599.7890625,
+      "ath_date": "2026-10-06",
+      "last_date": "2026-10-28",
+      "last_close": 26549.849609375,
+      "ath_alerts": {
+        "10": false,
+        "20": false,
+        "30": false,
+        "40": false
+      },
+      "52w_alerts": {
+        "10": false,
+        "20": false,
+        "30": false,
+        "40": false
+      },
+      "updated_utc": "2026-10-29T07:46:19.217247+00:00"
+    },
+    "^DJI": {
+      "initialized": true,
+      "ath_start_year": 1985,
+      "ath_close": 54349.12109375,
+      "ath_date": "2026-08-05",
+      "last_date": "2026-10-28",
+      "last_close": 52475.1015625,
+      "ath_alerts": {
+        "10": false,
+        "20": false,
+        "30": false,
+        "40": false
+      },
+      "52w_alerts": {
+        "10": false,
+        "20": false,
+        "30": false,
+        "40": false
+      },
+      "updated_utc": "2026-10-29T07:46:23.597034+00:00"
+    },
+    "^HSI": {
+      "initialized": true,
+      "ath_start_year": 1986,
+      "ath_close": 33154.12109375,
+      "ath_date": "2018-01-26",
+      "last_date": "2026-10-29",
+      "last_close": 23013.279296875,
+      "ath_alerts": {
+        "10": true,
+        "20": true,
+        "30": true,
+        "40": false
+      },
+      "52w_alerts": {
+        "10": true,
+        "20": false,
+        "30": false,
+        "40": false
+      },
+      "updated_utc": "2026-10-29T07:46:27.902700+00:00"
+    }
+  }
 }
