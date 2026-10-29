@@ -25,5 +25,54 @@ jobs:
       - name: Install dependencies
         run: python -m pip install -r requirements.txt
 
+      - name: Test ntfy mobile notification
+        if: github.event_name == 'workflow_dispatch'
+        env:
+          NTFY_TOPIC: ${{ secrets.NTFY_TOPIC }}
+          NTFY_TOKEN: ${{ secrets.NTFY_TOKEN }}
+        run: |
+          python - <<'PY'
+          import os
+          import requests
+          from datetime import datetime, timezone
+
+          topic = os.environ.get("NTFY_TOPIC", "").strip()
+          token = os.environ.get("NTFY_TOKEN", "").strip()
+
+          if not topic:
+              raise SystemExit(
+                  "ERROR: ไม่พบ Secret NTFY_TOPIC "
+                  "กรุณาตรวจสอบ Settings > Secrets and variables > Actions"
+              )
+
+          headers = {
+              "Title": "ทดสอบระบบแจ้งเตือนหุ้น",
+              "Tags": "white_check_mark",
+          }
+
+          if token:
+              headers["Authorization"] = f"Bearer {token}"
+
+          message = (
+              "แจ้งเตือนบนมือถือได้แล้ว! ระบบ Index Alert "
+              "เชื่อมต่อ ntfy สำเร็จ "
+              f"เวลา {datetime.now(timezone.utc).strftime('%Y-%m-%d %H:%M UTC')}\n"
+              "หากไม่มีข้อความแจ้งเตือนดัชนีเพิ่มเติม "
+              "แปลว่าวันนี้ยังไม่มีเงื่อนไขที่ถึงระดับแจ้งเตือน"
+          )
+
+          response = requests.post(
+              f"https://ntfy.sh/{topic}",
+              data=message.encode("utf-8"),
+              headers=headers,
+              timeout=20,
+          )
+          response.raise_for_status()
+
+          print("PASS: ntfy รับข้อความทดสอบแล้ว")
+          print(f"HTTP status: {response.status_code}")
+          print("กรุณาตรวจสอบแอป ntfy บนมือถือ")
+          PY
+
       - name: Check index data
         run: python test_yahoo_indices.py
