@@ -7,8 +7,8 @@
       "ath_start_year": 1970,
       "ath_close": 7818.93017578125,
       "ath_date": "2026-10-06",
-      "last_date": "2026-10-29",
-      "last_close": 7720.39013671875,
+      "last_date": "2026-10-30",
+      "last_close": 7580.06982421875,
       "ath_alerts": {
         "5": false,
         "10": false,
@@ -25,15 +25,15 @@
       },
       "initial_alerts_sent": true,
       "five_percent_alert_checked": true,
-      "updated_utc": "2026-10-30T02:15:42.589637+00:00"
+      "updated_utc": "2026-10-31T02:16:09.188018+00:00"
     },
     "^IXIC": {
       "initialized": true,
       "ath_start_year": 1970,
       "ath_close": 27599.7890625,
       "ath_date": "2026-10-06",
-      "last_date": "2026-10-29",
-      "last_close": 26184.724609375,
+      "last_date": "2026-10-30",
+      "last_close": 25436.998046875,
       "ath_alerts": {
         "5": true,
         "10": false,
@@ -50,15 +50,15 @@
       },
       "initial_alerts_sent": true,
       "five_percent_alert_checked": true,
-      "updated_utc": "2026-10-30T02:15:43.999306+00:00"
+      "updated_utc": "2026-10-31T02:16:10.308036+00:00"
     },
     "^DJI": {
       "initialized": true,
       "ath_start_year": 1985,
       "ath_close": 54349.12109375,
       "ath_date": "2026-08-05",
-      "last_date": "2026-10-29",
-      "last_close": 52342.55859375,
+      "last_date": "2026-10-30",
+      "last_close": 51770.30859375,
       "ath_alerts": {
         "5": false,
         "10": false,
@@ -75,7 +75,7 @@
       },
       "initial_alerts_sent": true,
       "five_percent_alert_checked": true,
-      "updated_utc": "2026-10-30T02:15:45.058865+00:00"
+      "updated_utc": "2026-10-31T02:16:11.407930+00:00"
     },
     "^HSI": {
       "initialized": true,
@@ -83,7 +83,7 @@
       "ath_close": 33154.12109375,
       "ath_date": "2018-01-26",
       "last_date": "2026-10-30",
-      "last_close": 23226.9296875,
+      "last_close": 23294.419921875,
       "ath_alerts": {
         "5": true,
         "10": true,
@@ -100,7 +100,7 @@
       },
       "initial_alerts_sent": true,
       "five_percent_alert_checked": true,
-      "updated_utc": "2026-10-30T02:15:46.116346+00:00"
+      "updated_utc": "2026-10-31T02:16:12.522928+00:00"
     }
   }
 }
