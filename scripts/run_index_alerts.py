@@ -11,18 +11,30 @@ from pathlib import Path
 
 import requests
 
+# ดัชนีหุ้นทั้งหมด 9 ดัชนี
 INDICES = {
     "^GSPC": "S&P 500",
     "^IXIC": "Nasdaq Composite",
     "^DJI": "Dow Jones",
     "^HSI": "Hang Seng Index",
+    "000001.SS": "SSE Composite Index",
+    "^VNINDEX.VN": "VNINDEX",
+    "^KS11": "KOSPI Composite Index",
+    "^TWII": "Taiwan Weighted Index",
+    "^NSEI": "NIFTY 50",
 }
 
+# ปีเริ่มต้นสำหรับค้นหาจุดสูงสุดย้อนหลัง
 HISTORY_START_YEARS = {
     "^GSPC": 1970,
     "^IXIC": 1970,
     "^DJI": 1985,
     "^HSI": 1986,
+    "000001.SS": 1990,
+    "^VNINDEX.VN": 2000,
+    "^KS11": 1980,
+    "^TWII": 1990,
+    "^NSEI": 1990,
 }
 
 BASE_URL = "https://query1.finance.yahoo.com/v8/finance/chart/{}"
@@ -30,7 +42,7 @@ HEADERS = {"User-Agent": "Mozilla/5.0 IndexAlert/2.3"}
 STATE_PATH = Path("data/alert_state.json")
 CHUNK_YEARS = 5
 
-# เพิ่มระดับ -5% สำหรับทดสอบระบบแจ้งเตือน
+# ระดับแจ้งเตือนเมื่อดัชนีลดลงจากจุดสูงสุด
 THRESHOLDS = (5, 10, 20, 30, 40)
 
 RECENT_DAYS = 5 * 366
@@ -285,7 +297,7 @@ def process_index(session, topic, token, state, symbol, name):
 
     initial_alerts_sent = saved.get("initial_alerts_sent", False)
 
-    # ตรวจระดับ -5% เพิ่มอีกครั้ง หากยังไม่เคยตรวจด้วยกติกาใหม่นี้
+    # ตรวจระดับ -5% หนึ่งครั้งหลังเพิ่มกติกาใหม่
     five_percent_check_pending = not saved.get(
         "five_percent_alert_checked", False
     )
@@ -303,7 +315,6 @@ def process_index(session, topic, token, state, symbol, name):
         for level in THRESHOLDS:
             key = str(level)
 
-            # บังคับตรวจระดับ -5% เพียงครั้งแรกหลังอัปเดต
             force_five_percent_check = (
                 level == 5 and five_percent_check_pending
             )
@@ -349,7 +360,7 @@ def process_index(session, topic, token, state, symbol, name):
                     priority="high",
                 )
 
-    # Keep the existing new-52-week-high alert behavior.
+    # แจ้งเตือนเมื่อทำจุดสูงสุดใหม่ในรอบ 52 สัปดาห์
     if (
         not is_baseline_run
         and latest_date != previous_date
@@ -392,6 +403,9 @@ def main():
 
     print("Index Alert starting")
     print(f"UTC time: {now_utc().isoformat()}")
+    print("Monitoring 9 stock indices:")
+    for symbol, name in INDICES.items():
+        print(f"  {name}: {symbol}")
     print("Historical baseline years:")
     for symbol, name in INDICES.items():
         print(f"  {name}: from {HISTORY_START_YEARS[symbol]}")
