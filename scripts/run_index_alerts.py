@@ -1,4 +1,3 @@
-
 #!/usr/bin/env python3
 """Index alerts using Yahoo Finance daily closes and ntfy."""
 
@@ -11,14 +10,13 @@ from pathlib import Path
 
 import requests
 
-# ดัชนีหุ้นทั้งหมด 9 ดัชนี
+# ดัชนีหุ้นที่ติดตามทั้งหมด 8 ดัชนี
 INDICES = {
     "^GSPC": "S&P 500",
     "^IXIC": "Nasdaq Composite",
     "^DJI": "Dow Jones",
     "^HSI": "Hang Seng Index",
     "000001.SS": "SSE Composite Index",
-    "^VNINDEX.VN": "VNINDEX",
     "^KS11": "KOSPI Composite Index",
     "^TWII": "Taiwan Weighted Index",
     "^NSEI": "NIFTY 50",
@@ -31,14 +29,13 @@ HISTORY_START_YEARS = {
     "^DJI": 1985,
     "^HSI": 1986,
     "000001.SS": 1990,
-    "^VNINDEX.VN": 2000,
     "^KS11": 1980,
     "^TWII": 1990,
     "^NSEI": 1990,
 }
 
 BASE_URL = "https://query1.finance.yahoo.com/v8/finance/chart/{}"
-HEADERS = {"User-Agent": "Mozilla/5.0 IndexAlert/2.3"}
+HEADERS = {"User-Agent": "Mozilla/5.0 IndexAlert/2.4"}
 STATE_PATH = Path("data/alert_state.json")
 CHUNK_YEARS = 5
 
@@ -295,38 +292,18 @@ def process_index(session, topic, token, state, symbol, name):
     new_52w_flags = threshold_flags(dd_52w)
     previous_date = saved.get("last_date")
 
-    initial_alerts_sent = saved.get("initial_alerts_sent", False)
+    old_ath_flags = saved.get("ath_alerts", {})
+    old_52w_flags = saved.get("52w_alerts", {})
 
-    # ตรวจระดับ -5% หนึ่งครั้งหลังเพิ่มกติกาใหม่
-    five_percent_check_pending = not saved.get(
-        "five_percent_alert_checked", False
-    )
+    # แจ้งเฉพาะเมื่อมีข้อมูลวันใหม่ และเพิ่งข้ามระดับจาก False เป็น True
+    # การทำ baseline ครั้งแรกจะบันทึกสถานะอย่างเดียว ไม่ยิงแจ้งเตือนย้อนหลัง
+    is_new_trading_day = latest_date != previous_date
 
-    should_check_thresholds = (
-        latest_date != previous_date
-        or not initial_alerts_sent
-        or five_percent_check_pending
-    )
-
-    if should_check_thresholds:
-        old_ath_flags = saved.get("ath_alerts", {})
-        old_52w_flags = saved.get("52w_alerts", {})
-
+    if not is_baseline_run and is_new_trading_day:
         for level in THRESHOLDS:
             key = str(level)
 
-            force_five_percent_check = (
-                level == 5 and five_percent_check_pending
-            )
-
-            if (
-                new_ath_flags[key]
-                and (
-                    force_five_percent_check
-                    or not old_ath_flags.get(key, False)
-                    or not initial_alerts_sent
-                )
-            ):
+            if new_ath_flags[key] and not old_ath_flags.get(key, False):
                 send_ntfy(
                     session,
                     topic,
@@ -336,18 +313,11 @@ def process_index(session, topic, token, state, symbol, name):
                     f"จากจุดสูงสุดที่พบตั้งแต่ {start_year} "
                     f"({ath_close:.2f})\n"
                     f"วันที่ข้อมูล: {latest_date}\n"
-                    f"ถึงระดับแจ้งเตือน -{level}%",
+                    f"เพิ่งข้ามระดับแจ้งเตือน -{level}%",
                     priority="high",
                 )
 
-            if (
-                new_52w_flags[key]
-                and (
-                    force_five_percent_check
-                    or not old_52w_flags.get(key, False)
-                    or not initial_alerts_sent
-                )
-            ):
+            if new_52w_flags[key] and not old_52w_flags.get(key, False):
                 send_ntfy(
                     session,
                     topic,
@@ -356,14 +326,14 @@ def process_index(session, topic, token, state, symbol, name):
                     f"{name}: ราคาปิดลดลง {dd_52w:.2f}% "
                     f"จากจุดสูงสุด 52 สัปดาห์ ({high_52w:.2f})\n"
                     f"วันที่ข้อมูล: {latest_date}\n"
-                    f"ถึงระดับแจ้งเตือน -{level}%",
+                    f"เพิ่งข้ามระดับแจ้งเตือน -{level}%",
                     priority="high",
                 )
 
     # แจ้งเตือนเมื่อทำจุดสูงสุดใหม่ในรอบ 52 สัปดาห์
     if (
         not is_baseline_run
-        and latest_date != previous_date
+        and is_new_trading_day
         and latest_close > high_52w
     ):
         send_ntfy(
@@ -376,6 +346,7 @@ def process_index(session, topic, token, state, symbol, name):
             f"วันที่ข้อมูล: {latest_date}",
         )
 
+    # บันทึกสถานะล่าสุดทุกครั้ง เพื่อให้ตรวจการข้ามระดับในรอบถัดไป
     state["indices"][symbol] = {
         "initialized": True,
         "ath_start_year": start_year,
@@ -385,8 +356,6 @@ def process_index(session, topic, token, state, symbol, name):
         "last_close": latest_close,
         "ath_alerts": new_ath_flags,
         "52w_alerts": new_52w_flags,
-        "initial_alerts_sent": True,
-        "five_percent_alert_checked": True,
         "updated_utc": now_utc().isoformat(),
     }
 
@@ -403,7 +372,7 @@ def main():
 
     print("Index Alert starting")
     print(f"UTC time: {now_utc().isoformat()}")
-    print("Monitoring 9 stock indices:")
+    print("Monitoring 8 stock indices:")
     for symbol, name in INDICES.items():
         print(f"  {name}: {symbol}")
     print("Historical baseline years:")
@@ -412,6 +381,10 @@ def main():
     print(
         "Historical maximum means the highest close found since "
         "the configured start year, not a guaranteed all-time high."
+    )
+    print(
+        "Alert mode: notify only when a new threshold is crossed "
+        "on a new trading day."
     )
     print("-" * 72)
 
