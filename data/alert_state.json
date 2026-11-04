@@ -7,8 +7,8 @@
       "ath_start_year": 1970,
       "ath_close": 7818.93017578125,
       "ath_date": "2026-10-06",
-      "last_date": "2026-11-02",
-      "last_close": 7541.39990234375,
+      "last_date": "2026-11-03",
+      "last_close": 7568.919921875,
       "ath_alerts": {
         "5": false,
         "10": false,
@@ -23,15 +23,15 @@
         "30": false,
         "40": false
       },
-      "updated_utc": "2026-11-03T02:19:52.010111+00:00"
+      "updated_utc": "2026-11-04T02:17:32.737762+00:00"
     },
     "^IXIC": {
       "initialized": true,
       "ath_start_year": 1970,
       "ath_close": 27599.7890625,
       "ath_date": "2026-10-06",
-      "last_date": "2026-11-02",
-      "last_close": 25164.36328125,
+      "last_date": "2026-11-03",
+      "last_close": 25372.009765625,
       "ath_alerts": {
         "5": true,
         "10": false,
@@ -46,15 +46,15 @@
         "30": false,
         "40": false
       },
-      "updated_utc": "2026-11-03T02:19:53.095366+00:00"
+      "updated_utc": "2026-11-04T02:17:33.843092+00:00"
     },
     "^DJI": {
       "initialized": true,
       "ath_start_year": 1985,
       "ath_close": 54349.12109375,
       "ath_date": "2026-08-05",
-      "last_date": "2026-11-02",
-      "last_close": 51983.98046875,
+      "last_date": "2026-11-03",
+      "last_close": 51786.71875,
       "ath_alerts": {
         "5": false,
         "10": false,
@@ -69,15 +69,15 @@
         "30": false,
         "40": false
       },
-      "updated_utc": "2026-11-03T02:19:54.154340+00:00"
+      "updated_utc": "2026-11-04T02:17:34.914807+00:00"
     },
     "^HSI": {
       "initialized": true,
       "ath_start_year": 1986,
       "ath_close": 33154.12109375,
       "ath_date": "2018-01-26",
-      "last_date": "2026-11-03",
-      "last_close": 23447.98046875,
+      "last_date": "2026-11-04",
+      "last_close": 23453.73046875,
       "ath_alerts": {
         "5": true,
         "10": true,
@@ -92,15 +92,15 @@
         "30": false,
         "40": false
       },
-      "updated_utc": "2026-11-03T02:19:55.228121+00:00"
+      "updated_utc": "2026-11-04T02:17:36.026529+00:00"
     },
     "000001.SS": {
       "initialized": true,
       "ath_start_year": 1990,
       "ath_close": 6092.05712890625,
       "ath_date": "2007-10-16",
-      "last_date": "2026-11-03",
-      "last_close": 3604.214599609375,
+      "last_date": "2026-11-04",
+      "last_close": 3604.773193359375,
       "ath_alerts": {
         "5": true,
         "10": true,
@@ -115,15 +115,15 @@
         "30": false,
         "40": false
       },
-      "updated_utc": "2026-11-03T02:19:56.293597+00:00"
+      "updated_utc": "2026-11-04T02:17:37.117371+00:00"
     },
     "^KS11": {
       "initialized": true,
       "ath_start_year": 1980,
       "ath_close": 9114.5498046875,
       "ath_date": "2026-06-22",
-      "last_date": "2026-11-03",
-      "last_close": 5717.330078125,
+      "last_date": "2026-11-04",
+      "last_close": 5565.85009765625,
       "ath_alerts": {
         "5": true,
         "10": true,
@@ -138,15 +138,15 @@
         "30": true,
         "40": false
       },
-      "updated_utc": "2026-11-03T02:19:57.363590+00:00"
+      "updated_utc": "2026-11-04T02:17:38.209764+00:00"
     },
     "^TWII": {
       "initialized": true,
       "ath_start_year": 1990,
       "ath_close": 49822.55078125,
       "ath_date": "2026-10-06",
-      "last_date": "2026-11-03",
-      "last_close": 44320.62109375,
+      "last_date": "2026-11-04",
+      "last_close": 43186.6796875,
       "ath_alerts": {
         "5": true,
         "10": true,
@@ -161,15 +161,15 @@
         "30": false,
         "40": false
       },
-      "updated_utc": "2026-11-03T02:19:58.546636+00:00"
+      "updated_utc": "2026-11-04T02:17:39.315456+00:00"
     },
     "^NSEI": {
       "initialized": true,
       "ath_start_year": 1990,
       "ath_close": 26328.55078125,
       "ath_date": "2026-01-02",
-      "last_date": "2026-10-30",
-      "last_close": 23053.099609375,
+      "last_date": "2026-11-02",
+      "last_close": 23440.80078125,
       "ath_alerts": {
         "5": true,
         "10": true,
@@ -184,7 +184,7 @@
         "30": false,
         "40": false
       },
-      "updated_utc": "2026-11-03T02:19:59.653744+00:00"
+      "updated_utc": "2026-11-04T02:17:40.381075+00:00"
     }
   }
 }
