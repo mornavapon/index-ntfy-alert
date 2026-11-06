@@ -7,77 +7,77 @@
       "ath_start_year": 1970,
       "ath_close": 7818.93017578125,
       "ath_date": "2026-10-06",
-      "last_date": "2026-11-04",
-      "last_close": 7688.6201171875,
+      "last_date": "2026-11-05",
+      "last_close": 7353.72998046875,
       "ath_alerts": {
-        "5": false,
+        "5": true,
         "10": false,
         "20": false,
         "30": false,
         "40": false
       },
       "52w_alerts": {
-        "5": false,
+        "5": true,
         "10": false,
         "20": false,
         "30": false,
         "40": false
       },
-      "updated_utc": "2026-11-05T02:27:33.595741+00:00"
+      "updated_utc": "2026-11-06T02:27:41.637850+00:00"
     },
     "^IXIC": {
       "initialized": true,
       "ath_start_year": 1970,
       "ath_close": 27599.7890625,
       "ath_date": "2026-10-06",
-      "last_date": "2026-11-04",
-      "last_close": 25736.513671875,
+      "last_date": "2026-11-05",
+      "last_close": 24314.998046875,
       "ath_alerts": {
         "5": true,
-        "10": false,
+        "10": true,
         "20": false,
         "30": false,
         "40": false
       },
       "52w_alerts": {
         "5": true,
-        "10": false,
+        "10": true,
         "20": false,
         "30": false,
         "40": false
       },
-      "updated_utc": "2026-11-05T02:27:34.786908+00:00"
+      "updated_utc": "2026-11-06T02:27:42.728440+00:00"
     },
     "^DJI": {
       "initialized": true,
       "ath_start_year": 1985,
       "ath_close": 54349.12109375,
       "ath_date": "2026-08-05",
-      "last_date": "2026-11-04",
-      "last_close": 53356.12109375,
+      "last_date": "2026-11-05",
+      "last_close": 51523.05859375,
       "ath_alerts": {
-        "5": false,
+        "5": true,
         "10": false,
         "20": false,
         "30": false,
         "40": false
       },
       "52w_alerts": {
-        "5": false,
+        "5": true,
         "10": false,
         "20": false,
         "30": false,
         "40": false
       },
-      "updated_utc": "2026-11-05T02:27:35.913407+00:00"
+      "updated_utc": "2026-11-06T02:27:43.808391+00:00"
     },
     "^HSI": {
       "initialized": true,
       "ath_start_year": 1986,
       "ath_close": 33154.12109375,
       "ath_date": "2018-01-26",
-      "last_date": "2026-11-05",
-      "last_close": 24592.009765625,
+      "last_date": "2026-11-06",
+      "last_close": 24624.8203125,
       "ath_alerts": {
         "5": true,
         "10": true,
@@ -92,21 +92,21 @@
         "30": false,
         "40": false
       },
-      "updated_utc": "2026-11-05T02:27:37.049959+00:00"
+      "updated_utc": "2026-11-06T02:27:44.890407+00:00"
     },
     "000001.SS": {
       "initialized": true,
       "ath_start_year": 1990,
       "ath_close": 6092.05712890625,
       "ath_date": "2007-10-16",
-      "last_date": "2026-11-05",
-      "last_close": 3690.6220703125,
+      "last_date": "2026-11-06",
+      "last_close": 3644.7353515625,
       "ath_alerts": {
         "5": true,
         "10": true,
         "20": true,
         "30": true,
-        "40": false
+        "40": true
       },
       "52w_alerts": {
         "5": true,
@@ -115,61 +115,61 @@
         "30": false,
         "40": false
       },
-      "updated_utc": "2026-11-05T02:27:38.152407+00:00"
+      "updated_utc": "2026-11-06T02:27:45.984320+00:00"
     },
     "^KS11": {
       "initialized": true,
       "ath_start_year": 1980,
       "ath_close": 9114.5498046875,
       "ath_date": "2026-06-22",
-      "last_date": "2026-11-05",
-      "last_close": 5479.31005859375,
+      "last_date": "2026-11-06",
+      "last_close": 5091.5,
       "ath_alerts": {
         "5": true,
         "10": true,
         "20": true,
         "30": true,
-        "40": false
+        "40": true
       },
       "52w_alerts": {
         "5": true,
         "10": true,
         "20": true,
         "30": true,
-        "40": false
+        "40": true
       },
-      "updated_utc": "2026-11-05T02:27:39.273887+00:00"
+      "updated_utc": "2026-11-06T02:27:47.096506+00:00"
     },
     "^TWII": {
       "initialized": true,
       "ath_start_year": 1990,
       "ath_close": 49822.55078125,
       "ath_date": "2026-10-06",
-      "last_date": "2026-11-05",
-      "last_close": 42155.5,
+      "last_date": "2026-11-06",
+      "last_close": 39001.421875,
       "ath_alerts": {
         "5": true,
         "10": true,
-        "20": false,
+        "20": true,
         "30": false,
         "40": false
       },
       "52w_alerts": {
         "5": true,
         "10": true,
-        "20": false,
+        "20": true,
         "30": false,
         "40": false
       },
-      "updated_utc": "2026-11-05T02:27:40.393167+00:00"
+      "updated_utc": "2026-11-06T02:27:48.214697+00:00"
     },
     "^NSEI": {
       "initialized": true,
       "ath_start_year": 1990,
       "ath_close": 26328.55078125,
       "ath_date": "2026-01-02",
-      "last_date": "2026-11-04",
-      "last_close": 23960.599609375,
+      "last_date": "2026-11-05",
+      "last_close": 24536.599609375,
       "ath_alerts": {
         "5": true,
         "10": false,
@@ -184,7 +184,7 @@
         "30": false,
         "40": false
       },
-      "updated_utc": "2026-11-05T02:27:41.510116+00:00"
+      "updated_utc": "2026-11-06T02:27:49.284699+00:00"
     }
   }
 }
