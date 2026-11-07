@@ -7,8 +7,8 @@
       "ath_start_year": 1970,
       "ath_close": 7818.93017578125,
       "ath_date": "2026-10-06",
-      "last_date": "2026-11-05",
-      "last_close": 7353.72998046875,
+      "last_date": "2026-11-06",
+      "last_close": 7376.85986328125,
       "ath_alerts": {
         "5": true,
         "10": false,
@@ -23,15 +23,15 @@
         "30": false,
         "40": false
       },
-      "updated_utc": "2026-11-06T02:27:41.637850+00:00"
+      "updated_utc": "2026-11-07T02:16:01.234092+00:00"
     },
     "^IXIC": {
       "initialized": true,
       "ath_start_year": 1970,
       "ath_close": 27599.7890625,
       "ath_date": "2026-10-06",
-      "last_date": "2026-11-05",
-      "last_close": 24314.998046875,
+      "last_date": "2026-11-06",
+      "last_close": 24579.423828125,
       "ath_alerts": {
         "5": true,
         "10": true,
@@ -46,15 +46,15 @@
         "30": false,
         "40": false
       },
-      "updated_utc": "2026-11-06T02:27:42.728440+00:00"
+      "updated_utc": "2026-11-07T02:16:02.310363+00:00"
     },
     "^DJI": {
       "initialized": true,
       "ath_start_year": 1985,
       "ath_close": 54349.12109375,
       "ath_date": "2026-08-05",
-      "last_date": "2026-11-05",
-      "last_close": 51523.05859375,
+      "last_date": "2026-11-06",
+      "last_close": 51285.73046875,
       "ath_alerts": {
         "5": true,
         "10": false,
@@ -69,7 +69,7 @@
         "30": false,
         "40": false
       },
-      "updated_utc": "2026-11-06T02:27:43.808391+00:00"
+      "updated_utc": "2026-11-07T02:16:03.385450+00:00"
     },
     "^HSI": {
       "initialized": true,
@@ -77,7 +77,7 @@
       "ath_close": 33154.12109375,
       "ath_date": "2018-01-26",
       "last_date": "2026-11-06",
-      "last_close": 24624.8203125,
+      "last_close": 24481.859375,
       "ath_alerts": {
         "5": true,
         "10": true,
@@ -92,7 +92,7 @@
         "30": false,
         "40": false
       },
-      "updated_utc": "2026-11-06T02:27:44.890407+00:00"
+      "updated_utc": "2026-11-07T02:16:04.462298+00:00"
     },
     "000001.SS": {
       "initialized": true,
@@ -100,7 +100,7 @@
       "ath_close": 6092.05712890625,
       "ath_date": "2007-10-16",
       "last_date": "2026-11-06",
-      "last_close": 3644.7353515625,
+      "last_close": 3649.177001953125,
       "ath_alerts": {
         "5": true,
         "10": true,
@@ -115,7 +115,7 @@
         "30": false,
         "40": false
       },
-      "updated_utc": "2026-11-06T02:27:45.984320+00:00"
+      "updated_utc": "2026-11-07T02:16:05.550296+00:00"
     },
     "^KS11": {
       "initialized": true,
@@ -123,7 +123,7 @@
       "ath_close": 9114.5498046875,
       "ath_date": "2026-06-22",
       "last_date": "2026-11-06",
-      "last_close": 5091.5,
+      "last_close": 5059.68994140625,
       "ath_alerts": {
         "5": true,
         "10": true,
@@ -138,7 +138,7 @@
         "30": true,
         "40": true
       },
-      "updated_utc": "2026-11-06T02:27:47.096506+00:00"
+      "updated_utc": "2026-11-07T02:16:06.668902+00:00"
     },
     "^TWII": {
       "initialized": true,
@@ -146,7 +146,7 @@
       "ath_close": 49822.55078125,
       "ath_date": "2026-10-06",
       "last_date": "2026-11-06",
-      "last_close": 39001.421875,
+      "last_close": 39701.640625,
       "ath_alerts": {
         "5": true,
         "10": true,
@@ -161,30 +161,30 @@
         "30": false,
         "40": false
       },
-      "updated_utc": "2026-11-06T02:27:48.214697+00:00"
+      "updated_utc": "2026-11-07T02:16:07.737734+00:00"
     },
     "^NSEI": {
       "initialized": true,
       "ath_start_year": 1990,
       "ath_close": 26328.55078125,
       "ath_date": "2026-01-02",
-      "last_date": "2026-11-05",
-      "last_close": 24536.599609375,
+      "last_date": "2026-11-06",
+      "last_close": 25030.349609375,
       "ath_alerts": {
-        "5": true,
+        "5": false,
         "10": false,
         "20": false,
         "30": false,
         "40": false
       },
       "52w_alerts": {
-        "5": true,
+        "5": false,
         "10": false,
         "20": false,
         "30": false,
         "40": false
       },
-      "updated_utc": "2026-11-06T02:27:49.284699+00:00"
+      "updated_utc": "2026-11-07T02:16:08.799274+00:00"
     }
   }
 }
