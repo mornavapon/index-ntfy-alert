@@ -1,5 +1,8 @@
 # Index Alert (ntfy) — v1
 
+ลิ้งค์ไปยังเอไอที่สร้าง
+https://chatgpt.com/g/g-p-6ae01a981d208191b90116a6a767d75e-github/c/6adf5dca-7538-83ec-982d-4aa934d56f95
+
 No website: GitHub Actions checks index closing prices and can send alerts to ntfy.
 
 ## What it does
