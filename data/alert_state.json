@@ -7,8 +7,8 @@
       "ath_start_year": 1970,
       "ath_close": 7818.93017578125,
       "ath_date": "2026-10-06",
-      "last_date": "2026-11-09",
-      "last_close": 7549.93994140625,
+      "last_date": "2026-11-10",
+      "last_close": 7520.93017578125,
       "ath_alerts": {
         "5": false,
         "10": false,
@@ -23,15 +23,15 @@
         "30": false,
         "40": false
       },
-      "updated_utc": "2026-11-10T02:23:01.100349+00:00"
+      "updated_utc": "2026-11-11T02:19:30.971462+00:00"
     },
     "^IXIC": {
       "initialized": true,
       "ath_start_year": 1970,
       "ath_close": 27599.7890625,
       "ath_date": "2026-10-06",
-      "last_date": "2026-11-09",
-      "last_close": 25253.138671875,
+      "last_date": "2026-11-10",
+      "last_close": 25065.875,
       "ath_alerts": {
         "5": true,
         "10": false,
@@ -46,15 +46,15 @@
         "30": false,
         "40": false
       },
-      "updated_utc": "2026-11-10T02:23:02.177992+00:00"
+      "updated_utc": "2026-11-11T02:19:32.071380+00:00"
     },
     "^DJI": {
       "initialized": true,
       "ath_start_year": 1985,
       "ath_close": 54349.12109375,
       "ath_date": "2026-08-05",
-      "last_date": "2026-11-09",
-      "last_close": 52389.75,
+      "last_date": "2026-11-10",
+      "last_close": 52231.890625,
       "ath_alerts": {
         "5": false,
         "10": false,
@@ -69,15 +69,15 @@
         "30": false,
         "40": false
       },
-      "updated_utc": "2026-11-10T02:23:03.250356+00:00"
+      "updated_utc": "2026-11-11T02:19:33.171909+00:00"
     },
     "^HSI": {
       "initialized": true,
       "ath_start_year": 1986,
       "ath_close": 33154.12109375,
       "ath_date": "2018-01-26",
-      "last_date": "2026-11-10",
-      "last_close": 24515.150390625,
+      "last_date": "2026-11-11",
+      "last_close": 24406.1796875,
       "ath_alerts": {
         "5": true,
         "10": true,
@@ -92,15 +92,15 @@
         "30": false,
         "40": false
       },
-      "updated_utc": "2026-11-10T02:23:04.383959+00:00"
+      "updated_utc": "2026-11-11T02:19:34.246189+00:00"
     },
     "000001.SS": {
       "initialized": true,
       "ath_start_year": 1990,
       "ath_close": 6092.05712890625,
       "ath_date": "2007-10-16",
-      "last_date": "2026-11-10",
-      "last_close": 3669.783447265625,
+      "last_date": "2026-11-11",
+      "last_close": 3660.912109375,
       "ath_alerts": {
         "5": true,
         "10": true,
@@ -115,15 +115,15 @@
         "30": false,
         "40": false
       },
-      "updated_utc": "2026-11-10T02:23:05.470025+00:00"
+      "updated_utc": "2026-11-11T02:19:35.309297+00:00"
     },
     "^KS11": {
       "initialized": true,
       "ath_start_year": 1980,
       "ath_close": 9114.5498046875,
       "ath_date": "2026-06-22",
-      "last_date": "2026-11-10",
-      "last_close": 5223.9501953125,
+      "last_date": "2026-11-11",
+      "last_close": 5276.18017578125,
       "ath_alerts": {
         "5": true,
         "10": true,
@@ -138,15 +138,15 @@
         "30": true,
         "40": true
       },
-      "updated_utc": "2026-11-10T02:23:06.564798+00:00"
+      "updated_utc": "2026-11-11T02:19:36.386383+00:00"
     },
     "^TWII": {
       "initialized": true,
       "ath_start_year": 1990,
       "ath_close": 49822.55078125,
       "ath_date": "2026-10-06",
-      "last_date": "2026-11-10",
-      "last_close": 42871.609375,
+      "last_date": "2026-11-11",
+      "last_close": 43074.8515625,
       "ath_alerts": {
         "5": true,
         "10": true,
@@ -161,7 +161,7 @@
         "30": false,
         "40": false
       },
-      "updated_utc": "2026-11-10T02:23:07.629639+00:00"
+      "updated_utc": "2026-11-11T02:19:37.490977+00:00"
     },
     "^NSEI": {
       "initialized": true,
@@ -184,7 +184,7 @@
         "30": false,
         "40": false
       },
-      "updated_utc": "2026-11-10T02:23:08.712929+00:00"
+      "updated_utc": "2026-11-11T02:19:38.589406+00:00"
     }
   }
 }
