@@ -1,5 +1,7 @@
 # Index Alert (ntfy) — v1
 
+<img width="479" height="435" alt="notify index move fast1" src="https://github.com/user-attachments/assets/0c35976c-4eb1-4203-b9c6-981d37e88718" />
+
 ลิ้งค์ไปยังเอไอที่สร้าง
 https://chatgpt.com/g/g-p-6ae01a981d208191b90116a6a767d75e-github/c/6adf5dca-7538-83ec-982d-4aa934d56f95
 
