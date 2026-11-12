@@ -7,8 +7,8 @@
       "ath_start_year": 1970,
       "ath_close": 7818.93017578125,
       "ath_date": "2026-10-06",
-      "last_date": "2026-11-11",
-      "last_close": 7619.3798828125,
+      "last_date": "2026-11-12",
+      "last_close": 7585.669921875,
       "ath_alerts": {
         "5": false,
         "10": false,
@@ -23,15 +23,15 @@
         "30": false,
         "40": false
       },
-      "updated_utc": "2026-11-12T02:26:10.593855+00:00"
+      "updated_utc": "2026-11-12T15:08:44.343214+00:00"
     },
     "^IXIC": {
       "initialized": true,
       "ath_start_year": 1970,
       "ath_close": 27599.7890625,
       "ath_date": "2026-10-06",
-      "last_date": "2026-11-11",
-      "last_close": 25466.189453125,
+      "last_date": "2026-11-12",
+      "last_close": 25275.61328125,
       "ath_alerts": {
         "5": true,
         "10": false,
@@ -46,15 +46,15 @@
         "30": false,
         "40": false
       },
-      "updated_utc": "2026-11-12T02:26:11.803128+00:00"
+      "updated_utc": "2026-11-12T15:08:45.458497+00:00"
     },
     "^DJI": {
       "initialized": true,
       "ath_start_year": 1985,
       "ath_close": 54349.12109375,
       "ath_date": "2026-08-05",
-      "last_date": "2026-11-11",
-      "last_close": 52486.48828125,
+      "last_date": "2026-11-12",
+      "last_close": 52461.6015625,
       "ath_alerts": {
         "5": false,
         "10": false,
@@ -69,7 +69,7 @@
         "30": false,
         "40": false
       },
-      "updated_utc": "2026-11-12T02:26:12.980013+00:00"
+      "updated_utc": "2026-11-12T15:08:46.550804+00:00"
     },
     "^HSI": {
       "initialized": true,
@@ -77,7 +77,7 @@
       "ath_close": 33154.12109375,
       "ath_date": "2018-01-26",
       "last_date": "2026-11-12",
-      "last_close": 24049.490234375,
+      "last_close": 24008.55078125,
       "ath_alerts": {
         "5": true,
         "10": true,
@@ -92,7 +92,7 @@
         "30": false,
         "40": false
       },
-      "updated_utc": "2026-11-12T02:26:14.150949+00:00"
+      "updated_utc": "2026-11-12T15:08:47.637535+00:00"
     },
     "000001.SS": {
       "initialized": true,
@@ -100,7 +100,7 @@
       "ath_close": 6092.05712890625,
       "ath_date": "2007-10-16",
       "last_date": "2026-11-12",
-      "last_close": 3691.681884765625,
+      "last_close": 3655.82958984375,
       "ath_alerts": {
         "5": true,
         "10": true,
@@ -115,15 +115,15 @@
         "30": false,
         "40": false
       },
-      "updated_utc": "2026-11-12T02:26:15.308146+00:00"
+      "updated_utc": "2026-11-12T15:08:48.748624+00:00"
     },
     "^KS11": {
       "initialized": true,
       "ath_start_year": 1980,
       "ath_close": 9114.5498046875,
       "ath_date": "2026-06-22",
-      "last_date": "2026-11-12",
-      "last_close": 5415.1201171875,
+      "last_date": "2026-11-11",
+      "last_close": 5375.35986328125,
       "ath_alerts": {
         "5": true,
         "10": true,
@@ -138,7 +138,7 @@
         "30": true,
         "40": true
       },
-      "updated_utc": "2026-11-12T02:26:16.462092+00:00"
+      "updated_utc": "2026-11-12T15:08:49.834667+00:00"
     },
     "^TWII": {
       "initialized": true,
@@ -146,7 +146,7 @@
       "ath_close": 49822.55078125,
       "ath_date": "2026-10-06",
       "last_date": "2026-11-12",
-      "last_close": 44429.26953125,
+      "last_close": 43091.87109375,
       "ath_alerts": {
         "5": true,
         "10": true,
@@ -161,15 +161,15 @@
         "30": false,
         "40": false
       },
-      "updated_utc": "2026-11-12T02:26:17.623948+00:00"
+      "updated_utc": "2026-11-12T15:08:50.955596+00:00"
     },
     "^NSEI": {
       "initialized": true,
       "ath_start_year": 1990,
       "ath_close": 26328.55078125,
       "ath_date": "2026-01-02",
-      "last_date": "2026-11-09",
-      "last_close": 25044.650390625,
+      "last_date": "2026-11-12",
+      "last_close": 25299.349609375,
       "ath_alerts": {
         "5": false,
         "10": false,
@@ -184,7 +184,7 @@
         "30": false,
         "40": false
       },
-      "updated_utc": "2026-11-12T02:26:18.774742+00:00"
+      "updated_utc": "2026-11-12T15:08:52.052048+00:00"
     }
   }
 }
