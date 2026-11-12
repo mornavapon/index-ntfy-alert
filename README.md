@@ -7,6 +7,8 @@ https://chatgpt.com/g/g-p-6ae01a981d208191b90116a6a767d75e-github/c/6adf5dca-753
 
 No website: GitHub Actions checks index closing prices and can send alerts to ntfy.
 
+(เปิดสิทธิ์ให้ chat GPT แก้ไขrepoนี้ได้อัตโนมัติ)
+
 ## What it does
 - S&P 500 (`^GSPC`), Nasdaq Composite (`^IXIC`), Dow Jones (`^DJI`), Hang Seng (`^HSI`)
 - Fetches daily data in 5-year chunks, then calculates the highest daily close in all returned history and rolling 52-week high.
