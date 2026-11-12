@@ -42,6 +42,18 @@ CHUNK_YEARS = 5
 # ระดับแจ้งเตือนเมื่อดัชนีลดลงจากจุดสูงสุด
 THRESHOLDS = (5, 10, 20, 30, 40)
 
+# TradingView chart links for each monitored index
+TRADINGVIEW_URLS = {
+    "^GSPC": "https://www.tradingview.com/chart/?symbol=SP%3ASPX",
+    "^IXIC": "https://www.tradingview.com/chart/?symbol=NASDAQ%3AIXIC",
+    "^DJI": "https://www.tradingview.com/chart/?symbol=DJ%3ADJI",
+    "^HSI": "https://www.tradingview.com/chart/?symbol=HKEX%3AHSI",
+    "000001.SS": "https://www.tradingview.com/chart/?symbol=SSE%3A000001",
+    "^KS11": "https://www.tradingview.com/chart/?symbol=KRX%3AKOSPI",
+    "^TWII": "https://www.tradingview.com/chart/?symbol=TWSE%3ATAIEX",
+    "^NSEI": "https://www.tradingview.com/chart/?symbol=NSE%3ANIFTY",
+}
+
 RECENT_DAYS = 5 * 366
 
 
@@ -210,7 +222,7 @@ def save_state(state):
     temp_path.replace(STATE_PATH)
 
 
-def send_ntfy(session, topic, token, title, message, priority="default"):
+def send_ntfy(session, topic, token, title, message, priority="default", action_url=None):
     headers = {
         "Title": title,
         "Tags": "chart_with_downwards_trend",
@@ -219,6 +231,10 @@ def send_ntfy(session, topic, token, title, message, priority="default"):
 
     if token:
         headers["Authorization"] = f"Bearer {token}"
+
+    # Separate action button; tapping the notification itself does not open the chart.
+    if action_url:
+        headers["Actions"] = f"view, Open TradingView, {action_url}"
 
     response = session.post(
         f"https://ntfy.sh/{topic}",
@@ -315,6 +331,7 @@ def process_index(session, topic, token, state, symbol, name):
                     f"วันที่ข้อมูล: {latest_date}\n"
                     f"เพิ่งข้ามระดับแจ้งเตือน -{level}%",
                     priority="high",
+                    action_url=TRADINGVIEW_URLS[symbol],
                 )
 
             if new_52w_flags[key] and not old_52w_flags.get(key, False):
@@ -328,6 +345,7 @@ def process_index(session, topic, token, state, symbol, name):
                     f"วันที่ข้อมูล: {latest_date}\n"
                     f"เพิ่งข้ามระดับแจ้งเตือน -{level}%",
                     priority="high",
+                    action_url=TRADINGVIEW_URLS[symbol],
                 )
 
     # แจ้งเตือนเมื่อทำจุดสูงสุดใหม่ในรอบ 52 สัปดาห์
@@ -344,6 +362,7 @@ def process_index(session, topic, token, state, symbol, name):
             f"{name}: ทำจุดสูงสุดใหม่ในรอบ 52 สัปดาห์\n"
             f"ราคาปิด: {latest_close:.2f}\n"
             f"วันที่ข้อมูล: {latest_date}",
+            action_url=TRADINGVIEW_URLS[symbol],
         )
 
     # บันทึกสถานะล่าสุดทุกครั้ง เพื่อให้ตรวจการข้ามระดับในรอบถัดไป
