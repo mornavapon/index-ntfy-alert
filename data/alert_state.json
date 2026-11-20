@@ -26,7 +26,7 @@
       "last_52w_low_alert_date": null,
       "last_52w_low_alert_close": null,
       "last_52w_low_check_date": "2026-11-19",
-      "updated_utc": "2026-11-20T11:06:37.647653+00:00"
+      "updated_utc": "2026-11-20T11:24:39.178272+00:00"
     },
     "^IXIC": {
       "initialized": true,
@@ -52,7 +52,7 @@
       "last_52w_low_alert_date": null,
       "last_52w_low_alert_close": null,
       "last_52w_low_check_date": "2026-11-19",
-      "updated_utc": "2026-11-20T11:06:38.735773+00:00"
+      "updated_utc": "2026-11-20T11:24:40.258201+00:00"
     },
     "^DJI": {
       "initialized": true,
@@ -78,7 +78,7 @@
       "last_52w_low_alert_date": null,
       "last_52w_low_alert_close": null,
       "last_52w_low_check_date": "2026-11-19",
-      "updated_utc": "2026-11-20T11:06:39.832151+00:00"
+      "updated_utc": "2026-11-20T11:24:41.344492+00:00"
     },
     "^HSI": {
       "initialized": true,
@@ -104,7 +104,7 @@
       "last_52w_low_alert_date": "2026-11-20",
       "last_52w_low_alert_close": 22410.80078125,
       "last_52w_low_check_date": "2026-11-20",
-      "updated_utc": "2026-11-20T11:06:41.024619+00:00"
+      "updated_utc": "2026-11-20T11:24:42.434385+00:00"
     },
     "000001.SS": {
       "initialized": true,
@@ -130,7 +130,7 @@
       "last_52w_low_alert_date": "2026-11-20",
       "last_52w_low_alert_close": 3533.79296875,
       "last_52w_low_check_date": "2026-11-20",
-      "updated_utc": "2026-11-20T11:06:42.140987+00:00"
+      "updated_utc": "2026-11-20T11:24:43.530812+00:00"
     },
     "^KS11": {
       "initialized": true,
@@ -156,7 +156,7 @@
       "last_52w_low_alert_date": null,
       "last_52w_low_alert_close": null,
       "last_52w_low_check_date": "2026-11-20",
-      "updated_utc": "2026-11-20T11:06:43.249047+00:00"
+      "updated_utc": "2026-11-20T11:24:44.625069+00:00"
     },
     "^TWII": {
       "initialized": true,
@@ -182,7 +182,7 @@
       "last_52w_low_alert_date": null,
       "last_52w_low_alert_close": null,
       "last_52w_low_check_date": "2026-11-20",
-      "updated_utc": "2026-11-20T11:06:44.356226+00:00"
+      "updated_utc": "2026-11-20T11:24:45.718184+00:00"
     },
     "^NSEI": {
       "initialized": true,
@@ -208,8 +208,61 @@
       "last_52w_low_alert_date": null,
       "last_52w_low_alert_close": null,
       "last_52w_low_check_date": "2026-11-20",
-      "updated_utc": "2026-11-20T11:06:45.436097+00:00"
+      "updated_utc": "2026-11-20T11:24:46.801506+00:00"
     }
   },
-  "assets": {}
+  "assets": {
+    "THB=X": {
+      "initialized": true,
+      "ath_start_year": 2021,
+      "ath_close": 38.29999923706055,
+      "ath_date": "2022-10-19",
+      "last_date": "2026-11-20",
+      "last_close": 33.88999938964844,
+      "ath_alerts": {
+        "5": true,
+        "10": true,
+        "20": false,
+        "30": false,
+        "40": false
+      },
+      "52w_alerts": {
+        "5": false,
+        "10": false,
+        "20": false,
+        "30": false,
+        "40": false
+      },
+      "last_52w_low_alert_date": null,
+      "last_52w_low_alert_close": null,
+      "last_52w_low_check_date": null,
+      "updated_utc": "2026-11-20T11:24:48.547464+00:00"
+    },
+    "DX-Y.NYB": {
+      "initialized": true,
+      "ath_start_year": 1985,
+      "ath_close": 164.72000122070312,
+      "ath_date": "1985-02-25",
+      "last_date": "2026-11-20",
+      "last_close": 103.86499786376953,
+      "ath_alerts": {
+        "5": true,
+        "10": true,
+        "20": true,
+        "30": true,
+        "40": false
+      },
+      "52w_alerts": {
+        "5": false,
+        "10": false,
+        "20": false,
+        "30": false,
+        "40": false
+      },
+      "last_52w_low_alert_date": null,
+      "last_52w_low_alert_close": null,
+      "last_52w_low_check_date": null,
+      "updated_utc": "2026-11-20T11:24:53.069685+00:00"
+    }
+  }
 }
