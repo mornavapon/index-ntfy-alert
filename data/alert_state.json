@@ -25,7 +25,8 @@
       },
       "last_52w_low_alert_date": null,
       "last_52w_low_alert_close": null,
-      "updated_utc": "2026-11-20T10:57:16.411912+00:00"
+      "last_52w_low_check_date": "2026-11-19",
+      "updated_utc": "2026-11-20T11:06:37.647653+00:00"
     },
     "^IXIC": {
       "initialized": true,
@@ -50,7 +51,8 @@
       },
       "last_52w_low_alert_date": null,
       "last_52w_low_alert_close": null,
-      "updated_utc": "2026-11-20T10:57:17.499174+00:00"
+      "last_52w_low_check_date": "2026-11-19",
+      "updated_utc": "2026-11-20T11:06:38.735773+00:00"
     },
     "^DJI": {
       "initialized": true,
@@ -75,7 +77,8 @@
       },
       "last_52w_low_alert_date": null,
       "last_52w_low_alert_close": null,
-      "updated_utc": "2026-11-20T10:57:18.584354+00:00"
+      "last_52w_low_check_date": "2026-11-19",
+      "updated_utc": "2026-11-20T11:06:39.832151+00:00"
     },
     "^HSI": {
       "initialized": true,
@@ -98,9 +101,10 @@
         "30": false,
         "40": false
       },
-      "last_52w_low_alert_date": null,
-      "last_52w_low_alert_close": null,
-      "updated_utc": "2026-11-20T10:57:19.668999+00:00"
+      "last_52w_low_alert_date": "2026-11-20",
+      "last_52w_low_alert_close": 22410.80078125,
+      "last_52w_low_check_date": "2026-11-20",
+      "updated_utc": "2026-11-20T11:06:41.024619+00:00"
     },
     "000001.SS": {
       "initialized": true,
@@ -123,9 +127,10 @@
         "30": false,
         "40": false
       },
-      "last_52w_low_alert_date": null,
-      "last_52w_low_alert_close": null,
-      "updated_utc": "2026-11-20T10:57:20.735150+00:00"
+      "last_52w_low_alert_date": "2026-11-20",
+      "last_52w_low_alert_close": 3533.79296875,
+      "last_52w_low_check_date": "2026-11-20",
+      "updated_utc": "2026-11-20T11:06:42.140987+00:00"
     },
     "^KS11": {
       "initialized": true,
@@ -150,7 +155,8 @@
       },
       "last_52w_low_alert_date": null,
       "last_52w_low_alert_close": null,
-      "updated_utc": "2026-11-20T10:57:21.802244+00:00"
+      "last_52w_low_check_date": "2026-11-20",
+      "updated_utc": "2026-11-20T11:06:43.249047+00:00"
     },
     "^TWII": {
       "initialized": true,
@@ -175,7 +181,8 @@
       },
       "last_52w_low_alert_date": null,
       "last_52w_low_alert_close": null,
-      "updated_utc": "2026-11-20T10:57:22.887437+00:00"
+      "last_52w_low_check_date": "2026-11-20",
+      "updated_utc": "2026-11-20T11:06:44.356226+00:00"
     },
     "^NSEI": {
       "initialized": true,
@@ -200,7 +207,8 @@
       },
       "last_52w_low_alert_date": null,
       "last_52w_low_alert_close": null,
-      "updated_utc": "2026-11-20T10:57:23.973522+00:00"
+      "last_52w_low_check_date": "2026-11-20",
+      "updated_utc": "2026-11-20T11:06:45.436097+00:00"
     }
   }
 }
