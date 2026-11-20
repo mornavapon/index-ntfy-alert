@@ -1,6 +1,10 @@
 name: Gold Spot alerts
 
 on:
+  push:
+    paths:
+      - '.github/workflows/gold-spot-alerts.yml'
+      - 'scripts/run_gold_spot_alert.py'
   workflow_dispatch:
   schedule:
     # 08:45 Thailand time, Monday-Saturday (15 minutes after Index alerts)
