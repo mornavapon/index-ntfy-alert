@@ -1,0 +1,24 @@
+{
+  "history": [
+    {
+      "date": "2026-11-20",
+      "close": 3579.25,
+      "updated_at": "2026-11-20T14:14:36+00:00"
+    }
+  ],
+  "state": {
+    "52w_alerts": {},
+    "tracking_high": 3579.25,
+    "tracking_high_date": "2026-11-20",
+    "tracking_high_alerts": {
+      "5": false,
+      "10": false,
+      "20": false,
+      "30": false,
+      "40": false
+    },
+    "last_date": "2026-11-20",
+    "last_price": 3579.25,
+    "updated_utc": "2026-11-20T14:15:04.508708+00:00"
+  }
+}
