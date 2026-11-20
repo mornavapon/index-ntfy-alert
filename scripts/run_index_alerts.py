@@ -56,6 +56,23 @@ TRADINGVIEW_URLS = {
 
 RECENT_DAYS = 5 * 366
 
+# สินทรัพย์เพิ่มเติม (แยกสถานะจากดัชนีหุ้นเดิม)
+ASSETS = {
+    "THB=X": "USD/THB (เงินบาทต่อดอลลาร์สหรัฐ)",
+    "DX-Y.NYB": "US Dollar Index (DXY)",
+}
+
+ASSET_HISTORY_START_YEARS = {
+    # Yahoo Finance มีข้อมูล USD/THB ที่ตรวจสอบได้ตั้งแต่ปี 2021
+    "THB=X": 2021,
+    "DX-Y.NYB": 1985,
+}
+
+ASSET_TRADINGVIEW_URLS = {
+    "THB=X": "https://www.tradingview.com/chart/?symbol=FX_IDC%3AUSDTHB",
+    "DX-Y.NYB": "https://www.tradingview.com/chart/?symbol=TVC%3ADXY",
+}
+
 
 def now_utc():
     return datetime.now(timezone.utc)
@@ -199,7 +216,7 @@ def fetch_historical_data(session, symbol, start_year):
 
 def load_state():
     if not STATE_PATH.exists():
-        return {"indices": {}}
+        return {"indices": {}, "assets": {}}
 
     with STATE_PATH.open("r", encoding="utf-8") as file:
         state = json.load(file)
@@ -208,6 +225,7 @@ def load_state():
         raise RuntimeError("Invalid alert state file.")
 
     state.setdefault("indices", {})
+    state.setdefault("assets", {})
     return state
 
 
@@ -413,6 +431,129 @@ def process_index(session, topic, token, state, symbol, name):
     }
 
 
+
+def process_asset(session, topic, token, state, symbol, name):
+    """Process a non-equity asset without sharing index alert state."""
+    start_year = ASSET_HISTORY_START_YEARS[symbol]
+    saved = state["assets"].get(symbol, {})
+
+    needs_baseline = (
+        not saved.get("initialized", False)
+        or saved.get("ath_start_year") != start_year
+    )
+
+    if needs_baseline:
+        print(
+            f"INFO | {name} | Building asset historical baseline "
+            f"from {start_year}..."
+        )
+        rows = fetch_historical_data(session, symbol, start_year)
+        ath_date, ath_close = max(rows, key=lambda item: item[1])
+        is_baseline_run = True
+    else:
+        rows = fetch_recent_history(session, symbol)
+        old_ath = float(saved["ath_close"])
+        ath_close = max(old_ath, max(close for _, close in rows))
+        ath_date = saved.get("ath_date", "unknown")
+        if ath_close > old_ath:
+            ath_date = max(rows, key=lambda item: item[1])[0]
+        is_baseline_run = False
+
+    latest_date, latest_close = rows[-1]
+    previous_window = rows[-253:-1]
+    if len(previous_window) < 252:
+        raise RuntimeError(f"Insufficient 52-week history for {symbol}")
+
+    high_52w_date, high_52w = max(previous_window, key=lambda item: item[1])
+    low_52w_date, low_52w = min(previous_window, key=lambda item: item[1])
+    dd_ath = (latest_close / ath_close - 1) * 100
+    dd_52w = (latest_close / high_52w - 1) * 100
+
+    print(
+        f"PASS | {name} | close date={latest_date} "
+        f"| close={latest_close:.4f} "
+        f"| highest close since {start_year}={ath_close:.4f} ({ath_date}) "
+        f"| previous 52-week high={high_52w:.4f} ({high_52w_date}) "
+        f"| previous 52-week low={low_52w:.4f} ({low_52w_date}) "
+        f"| drawdown={dd_ath:.2f}% / {dd_52w:.2f}%"
+    )
+
+    new_ath_flags = threshold_flags(dd_ath)
+    new_52w_flags = threshold_flags(dd_52w)
+    previous_date = saved.get("last_date")
+    old_ath_flags = saved.get("ath_alerts", {})
+    old_52w_flags = saved.get("52w_alerts", {})
+    is_new_trading_day = latest_date != previous_date
+    chart_url = ASSET_TRADINGVIEW_URLS[symbol]
+
+    if not is_baseline_run and is_new_trading_day:
+        for level in THRESHOLDS:
+            key = str(level)
+            if new_ath_flags[key] and not old_ath_flags.get(key, False):
+                send_ntfy(
+                    session, topic, token, "Market Asset Alert",
+                    f"{name}: ราคาปิดเปลี่ยนแปลง {dd_ath:.2f}% "
+                    f"จากจุดสูงสุดที่พบตั้งแต่ {start_year} ({ath_close:.4f})\\n"
+                    f"วันที่ข้อมูล: {latest_date}\\n"
+                    f"เพิ่งข้ามระดับ -{level}%",
+                    priority="high", action_url=chart_url,
+                )
+            if new_52w_flags[key] and not old_52w_flags.get(key, False):
+                send_ntfy(
+                    session, topic, token, "Market Asset Alert",
+                    f"{name}: ราคาปิดเปลี่ยนแปลง {dd_52w:.2f}% "
+                    f"จากจุดสูงสุด 52 สัปดาห์ ({high_52w:.4f})\\n"
+                    f"วันที่ข้อมูล: {latest_date}\\n"
+                    f"เพิ่งข้ามระดับ -{level}%",
+                    priority="high", action_url=chart_url,
+                )
+
+    if (
+        not is_baseline_run
+        and is_new_trading_day
+        and latest_close > high_52w
+    ):
+        send_ntfy(
+            session, topic, token, "Market Asset Alert",
+            f"{name}: ทำจุดสูงสุดใหม่ในรอบ 52 สัปดาห์\\n"
+            f"ราคาปิด: {latest_close:.4f}\\n"
+            f"วันที่ข้อมูล: {latest_date}",
+            action_url=chart_url,
+        )
+
+    if (
+        not is_baseline_run
+        and latest_date != saved.get("last_52w_low_check_date")
+    ):
+        if latest_close < low_52w:
+            send_ntfy(
+                session, topic, token, "Market Asset Alert",
+                f"{name}: ทำจุดต่ำสุดใหม่ในรอบ 52 สัปดาห์\\n"
+                f"ราคาปิด: {latest_close:.4f}\\n"
+                f"ต่ำกว่าจุดต่ำสุดเดิม ({low_52w:.4f}) "
+                f"วันที่ {low_52w_date}\\n"
+                f"วันที่ข้อมูล: {latest_date}",
+                priority="high", action_url=chart_url,
+            )
+            saved["last_52w_low_alert_date"] = latest_date
+            saved["last_52w_low_alert_close"] = latest_close
+        saved["last_52w_low_check_date"] = latest_date
+
+    state["assets"][symbol] = {
+        "initialized": True,
+        "ath_start_year": start_year,
+        "ath_close": ath_close,
+        "ath_date": ath_date,
+        "last_date": latest_date,
+        "last_close": latest_close,
+        "ath_alerts": new_ath_flags,
+        "52w_alerts": new_52w_flags,
+        "last_52w_low_alert_date": saved.get("last_52w_low_alert_date"),
+        "last_52w_low_alert_close": saved.get("last_52w_low_alert_close"),
+        "last_52w_low_check_date": saved.get("last_52w_low_check_date"),
+        "updated_utc": now_utc().isoformat(),
+    }
+
 def main():
     topic = os.environ.get("NTFY_TOPIC", "").strip()
     token = os.environ.get("NTFY_TOKEN", "").strip()
@@ -422,6 +563,7 @@ def main():
 
     state = load_state()
     failures = 0
+    asset_failures = 0
 
     print("Index Alert starting")
     print(f"UTC time: {now_utc().isoformat()}")
@@ -453,17 +595,31 @@ def main():
 
             time.sleep(1)
 
+        print("-" * 72)
+        print("Monitoring additional assets (separate state):")
+        for symbol, name in ASSETS.items():
+            print(f"  {name}: {symbol}")
+        for symbol, name in ASSETS.items():
+            try:
+                process_asset(
+                    session, topic, token, state, symbol, name
+                )
+            except Exception as exc:
+                asset_failures += 1
+                print(f"FAIL | ASSET | {name} ({symbol}) | {exc}")
+            time.sleep(1)
+
     save_state(state)
     print("-" * 72)
     print(f"State saved to {STATE_PATH}")
 
-    if failures:
+    if failures or asset_failures:
         sys.exit(
-            f"{failures} index check(s) failed. "
+            f"{failures} index check(s) and {asset_failures} asset check(s) failed. "
             "Review the logs before relying on alerts."
         )
 
-    print("All index checks completed successfully.")
+    print("All index and asset checks completed successfully.")
 
 
 if __name__ == "__main__":
