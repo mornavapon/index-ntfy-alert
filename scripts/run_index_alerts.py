@@ -381,10 +381,10 @@ def process_index(session, topic, token, state, symbol, name):
             topic,
             token,
             "Index Alert",
-            f"{name}: ทำจุดต่ำสุดใหม่ในรอบ 52 สัปดาห์\\n"
-            f"ราคาปิด: {latest_close:.2f}\\n"
+            f"{name}: ทำจุดต่ำสุดใหม่ในรอบ 52 สัปดาห์\n"
+            f"ราคาปิด: {latest_close:.2f}\n"
             f"ต่ำกว่าจุดต่ำสุดเดิม ({low_52w:.2f}) "
-            f"วันที่ {low_52w_date}\\n"
+            f"วันที่ {low_52w_date}\n"
             f"วันที่ข้อมูล: {latest_date}",
             priority="high",
             action_url=TRADINGVIEW_URLS[symbol],
