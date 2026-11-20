@@ -370,27 +370,31 @@ def process_index(session, topic, token, state, symbol, name):
             action_url=TRADINGVIEW_URLS[symbol],
         )
 
-    # แจ้งเตือนเมื่อราคาปิดทำจุดต่ำสุดใหม่ในรอบ 52 สัปดาห์
+    # ใช้วันที่ตรวจสอบ 52-week low แยกจาก last_date
+    # เพื่อให้การเพิ่มฟีเจอร์ครั้งแรกยังตรวจวันล่าสุดได้ แม้ระบบเดิม
+    # จะบันทึกวันซื้อขายนี้ไปแล้วจากการตรวจ ATH / 52-week high
     if (
         not is_baseline_run
-        and is_new_trading_day
-        and latest_close < low_52w
+        and latest_date != saved.get("last_52w_low_check_date")
     ):
-        send_ntfy(
-            session,
-            topic,
-            token,
-            "Index Alert",
-            f"{name}: ทำจุดต่ำสุดใหม่ในรอบ 52 สัปดาห์\n"
-            f"ราคาปิด: {latest_close:.2f}\n"
-            f"ต่ำกว่าจุดต่ำสุดเดิม ({low_52w:.2f}) "
-            f"วันที่ {low_52w_date}\n"
-            f"วันที่ข้อมูล: {latest_date}",
-            priority="high",
-            action_url=TRADINGVIEW_URLS[symbol],
-        )
-        saved["last_52w_low_alert_date"] = latest_date
-        saved["last_52w_low_alert_close"] = latest_close
+        if latest_close < low_52w:
+            send_ntfy(
+                session,
+                topic,
+                token,
+                "Index Alert",
+                f"{name}: ทำจุดต่ำสุดใหม่ในรอบ 52 สัปดาห์\n"
+                f"ราคาปิด: {latest_close:.2f}\n"
+                f"ต่ำกว่าจุดต่ำสุดเดิม ({low_52w:.2f}) "
+                f"วันที่ {low_52w_date}\n"
+                f"วันที่ข้อมูล: {latest_date}",
+                priority="high",
+                action_url=TRADINGVIEW_URLS[symbol],
+            )
+            saved["last_52w_low_alert_date"] = latest_date
+            saved["last_52w_low_alert_close"] = latest_close
+
+        saved["last_52w_low_check_date"] = latest_date
 
     # บันทึกสถานะล่าสุดทุกครั้ง เพื่อให้ตรวจการข้ามระดับในรอบถัดไป
     state["indices"][symbol] = {
@@ -404,6 +408,7 @@ def process_index(session, topic, token, state, symbol, name):
         "52w_alerts": new_52w_flags,
         "last_52w_low_alert_date": saved.get("last_52w_low_alert_date"),
         "last_52w_low_alert_close": saved.get("last_52w_low_alert_close"),
+        "last_52w_low_check_date": saved.get("last_52w_low_check_date"),
         "updated_utc": now_utc().isoformat(),
     }
 
