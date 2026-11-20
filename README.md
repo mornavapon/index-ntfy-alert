@@ -1,35 +1,210 @@
-# Index Alert (ntfy) — v1
+# Index Alert — ระบบแจ้งเตือนดัชนีหุ้นผ่าน ntfy
 
-<img width="479" height="435" alt="notify index move fast1" src="https://github.com/user-attachments/assets/0c35976c-4eb1-4203-b9c6-981d37e88718" />
+<img width="479" height="435" alt="ตัวอย่างการแจ้งเตือนดัชนีหุ้น" src="https://github.com/user-attachments/assets/0c35976c-4eb1-4203-b9c6-981d37e88718" />
 
-ลิ้งค์ไปยังเอไอที่สร้าง
-https://chatgpt.com/g/g-p-6ae01a981d208191b90116a6a767d75e-github/c/6adf5dca-7538-83ec-982d-4aa934d56f95
+**ลิงก์ไปยัง AI ที่ช่วยสร้างและพัฒนาโปรเจกต์นี้**
 
-No website: GitHub Actions checks index closing prices and can send alerts to ntfy.
+[เปิดบทสนทนา ChatGPT ของโปรเจกต์นี้](https://chatgpt.com/g/g-p-6ae01a981d208191b90116a6a767d75e-github/c/6adf5dca-7538-83ec-982d-4aa934d56f95)
 
-(เปิดสิทธิ์ให้ chat GPT แก้ไขrepoนี้ได้อัตโนมัติ ทั้ง read & write)
+**No website:** GitHub Actions checks index closing prices and can send alerts to ntfy.  
+โปรเจกต์นี้ไม่มีเว็บไซต์ให้เข้าใช้งาน ระบบทำงานอัตโนมัติผ่าน GitHub Actions และส่งการแจ้งเตือนไปยังแอป ntfy
 
-## What it does
-- S&P 500 (`^GSPC`), Nasdaq Composite (`^IXIC`), Dow Jones (`^DJI`), Hang Seng (`^HSI`)
-- Fetches daily data in 5-year chunks, then calculates the highest daily close in all returned history and rolling 52-week high.
-- Alerts at drawdowns of 10%, 20%, 30%, and 40% from both highs.
-- Alerts on a new 52-week closing high.
-- Saves state in `data/alert_state.json` to avoid repeating threshold alerts each day.
+**หมายเหตุเรื่องสิทธิ์:** เปิดสิทธิ์ให้ ChatGPT แก้ไข Repository นี้ได้อัตโนมัติ ทั้ง Read & Write
 
-## Setup
-1. Create a topic at https://ntfy.sh. Use a long, hard-to-guess name.
-2. GitHub repo → **Settings → Secrets and variables → Actions → New repository secret**.
-3. Add `NTFY_TOPIC` = your topic name. Add `NTFY_TOKEN` only if your ntfy topic requires authentication.
-4. Replace `.github/workflows/test-yahoo-data.yml` with the workflow in this ZIP.
-5. Add `scripts/run_index_alerts.py` and `data/alert_state.json` at those exact paths.
-6. Repo → **Settings → Actions → General → Workflow permissions** → choose **Read and write permissions** → Save.
-7. Actions → **Index alerts** → **Run workflow**. Review the logs.
+---
 
-## Important
-- Yahoo Finance is unofficial and can change availability, symbols, and history.
-- The script stops without saving state or sending alerts if any index fails, to avoid acting on incomplete data.
-- First successful run initializes the alert state and does not send historic drawdown alerts. It sends a setup message only if `NTFY_TOPIC` is configured.
-- "ATH" means the highest daily close in the full history successfully returned by Yahoo from the configured start date (1970-01-01); it is not a guarantee of the exchange's official all-time record.
-- A public ntfy topic is not private. Keep the topic name secret or configure ntfy authentication.
-- Scheduled GitHub Actions may start late. Runs at 01:40 UTC (08:40 Thailand), Monday–Saturday.
-- Never commit an ntfy token into code.
+## 1. ระบบนี้ทำอะไร
+
+ระบบจะดึงข้อมูล **ราคาปิดรายวัน (Daily Close)** ของดัชนีหุ้นจาก Yahoo Finance แล้วคำนวณการปรับตัวลงจากจุดสูงสุด พร้อมส่งข้อความแจ้งเตือนผ่าน ntfy เมื่อเข้าเงื่อนไขที่กำหนด
+
+### ดัชนีที่ติดตามทั้งหมด 8 ดัชนี
+
+| ตลาด | ดัชนี | Yahoo Finance Symbol |
+|---|---|---|
+| สหรัฐฯ | S&P 500 | `^GSPC` |
+| สหรัฐฯ | Nasdaq Composite | `^IXIC` |
+| สหรัฐฯ | Dow Jones | `^DJI` |
+| ฮ่องกง | Hang Seng Index | `^HSI` |
+| จีน | SSE Composite Index (Shanghai) | `000001.SS` |
+| เกาหลีใต้ | KOSPI Composite Index | `^KS11` |
+| ไต้หวัน | Taiwan Weighted Index (TAIEX) | `^TWII` |
+| อินเดีย | NIFTY 50 | `^NSEI` |
+
+## 2. เงื่อนไขการแจ้งเตือน
+
+### 2.1 ดัชนีปรับตัวลงจากจุดสูงสุดย้อนหลัง (ATH)
+
+ระบบคำนวณเปอร์เซ็นต์การลดลงจาก **ราคาปิดสูงสุดที่ระบบค้นพบในข้อมูลย้อนหลังของ Yahoo Finance** และแจ้งเตือนเมื่อราคาปิดข้ามระดับต่อไปนี้
+
+- ลดลงตั้งแต่ **-5%**
+- ลดลงตั้งแต่ **-10%**
+- ลดลงตั้งแต่ **-20%**
+- ลดลงตั้งแต่ **-30%**
+- ลดลงตั้งแต่ **-40%**
+
+ปีเริ่มต้นที่ใช้ค้นหาจุดสูงสุดย้อนหลังของแต่ละดัชนีไม่เท่ากัน ดังนี้
+
+| ดัชนี | เริ่มค้นหาข้อมูลตั้งแต่ |
+|---|---:|
+| S&P 500 | 1970 |
+| Nasdaq Composite | 1970 |
+| Dow Jones | 1985 |
+| Hang Seng Index | 1986 |
+| SSE Composite Index | 1990 |
+| KOSPI Composite Index | 1980 |
+| Taiwan Weighted Index | 1990 |
+| NIFTY 50 | 1990 |
+
+**ข้อควรเข้าใจ:** ATH ในระบบนี้หมายถึงราคาปิดสูงสุดที่ค้นพบจากข้อมูล Yahoo Finance ตั้งแต่ปีเริ่มต้นที่กำหนด ไม่ใช่การรับรองว่าเป็น All-Time High อย่างเป็นทางการของตลาด และไม่ใช่ราคาสูงสุดระหว่างวัน
+
+### 2.2 การปรับตัวลงจากจุดสูงสุด 52 สัปดาห์ (52-Week High)
+
+ใช้ราคาปิดสูงสุดในช่วงประมาณ 52 สัปดาห์ก่อนหน้าวันข้อมูลล่าสุดเป็นฐาน และแจ้งเตือนเมื่อปรับตัวลงข้ามระดับเดียวกัน ได้แก่
+
+**-5%, -10%, -20%, -30% และ -40%**
+
+### 2.3 ทำจุดสูงสุดใหม่ในรอบ 52 สัปดาห์
+
+เมื่อราคาปิดล่าสุดสูงกว่าราคาปิดสูงสุดของช่วง 52 สัปดาห์ก่อนหน้า ระบบจะส่งการแจ้งเตือนว่าเกิด **New 52-Week High**
+
+### 2.4 สิ่งที่ระบบยังไม่มี
+
+- **ไม่มีการแจ้งเตือน ATL (All-Time Low)**
+- **ไม่มีการแจ้งเตือน 52-Week Low**
+- ไม่มีการแจ้งเตือนการปรับขึ้นเป็นเปอร์เซ็นต์จากจุดต่ำสุด
+
+## 3. ความถี่ในการตรวจสอบและการแจ้งเตือน
+
+### ตารางเวลาทำงานอัตโนมัติ
+
+GitHub Actions ตั้งเวลาให้เริ่มทำงานตาม Cron:
+
+`30 1 * * 1-6` (UTC)
+
+เทียบเป็นเวลาไทย (UTC+7):
+
+- **08:30 น. ทุกวันจันทร์–เสาร์**
+- ไม่ตั้งให้ทำงานในวันอาทิตย์
+- เป็นการตรวจสอบวันละครั้ง ไม่ใช่การตรวจสอบทุกชั่วโมงหรือตลอดเวลาระหว่างวัน
+
+ระบบใช้ราคาปิดรายวัน จึงไม่ได้ติดตามการแกว่งตัวระหว่างวันแบบเรียลไทม์
+
+### GitHub Actions อาจเริ่มช้ากว่าเวลาที่ตั้งไว้หรือไม่?
+
+เวลา 08:30 น. คือเวลาเริ่มตามกำหนด ไม่ใช่เวลารับประกันว่า Workflow จะเริ่มตรงนาที GitHub Actions อาจเริ่มช้าได้จากภาระงานของระบบ โดยทั่วไปควรเผื่อเวลาคลาดเคลื่อนเป็นหลักนาที แต่ **GitHub ไม่รับประกันเวลาสูงสุดที่แน่นอน** จึงไม่ควรใช้ระบบนี้เป็นสัญญาณซื้อขายแบบทันที
+
+### แล้ว ntfy จะส่งแจ้งเตือนบ่อยแค่ไหน?
+
+ntfy ไม่ได้ส่งข้อความทุกครั้งที่ Workflow ทำงาน แต่จะส่งเฉพาะเมื่อเกิดเหตุการณ์ตามเงื่อนไข เช่น
+
+- ราคาปิดข้ามระดับ Drawdown ใหม่ เช่น จากยังไม่ถึง -10% แล้วลดลงจนถึง -10%
+- ทำจุดสูงสุดใหม่ในรอบ 52 สัปดาห์
+- ผู้ใช้กด Run workflow เอง จะมีข้อความทดสอบการเชื่อมต่อ ntfy ก่อนเริ่มตรวจดัชนี
+
+ระบบจะไม่ส่งข้อความซ้ำทุกวันเพียงเพราะดัชนียังคงอยู่ต่ำกว่าระดับเดิม เช่น ข้าม -10% ไปแล้วและยังอยู่ที่ -12% ก็จะไม่ส่ง -10% ซ้ำทุกวัน แต่หากภายหลังฟื้นตัวจนกลับมาเหนือระดับ แล้วลดลงมาข้ามระดับนั้นอีกครั้ง ก็สามารถแจ้งเตือนรอบใหม่ได้
+
+การข้ามหลายระดับในวันเดียวอาจทำให้ได้รับหลายข้อความ เพราะแต่ละระดับเป็นเงื่อนไขแยกกัน
+
+## 4. การป้องกันการแจ้งเตือนซ้ำและไฟล์สถานะ
+
+ระบบเก็บสถานะไว้ที่:
+
+`data/alert_state.json`
+
+ไฟล์นี้ใช้บันทึกข้อมูล เช่น
+
+- จุดสูงสุดที่ระบบเคยพบและวันที่เกิด
+- วันที่และราคาปิดล่าสุดที่ตรวจสอบ
+- ระดับ Drawdown ที่เคยแจ้งเตือนไปแล้ว ทั้งฝั่ง ATH และ 52-Week High
+- เวลาอัปเดตสถานะล่าสุด
+
+GitHub Actions จะบันทึกและ Commit ไฟล์สถานะกลับเข้า Repository หลังการทำงานสำเร็จ เพื่อให้รอบถัดไปใช้ข้อมูลเดิมต่อได้
+
+**อย่าลบหรือแก้ไขไฟล์นี้โดยไม่จำเป็น** เพราะระบบอาจต้องสร้าง Baseline ใหม่ และการแจ้งเตือนย้อนหลังจะไม่ทำงานในรอบสร้าง Baseline ครั้งแรก
+
+การทำงานครั้งแรก หรือครั้งแรกหลังเปลี่ยนปีเริ่มต้นของประวัติ จะสร้าง Baseline และบันทึกสถานะก่อน โดยไม่ส่งแจ้งเตือน Drawdown ย้อนหลัง
+
+## 5. การดึงข้อมูลและการตรวจสอบความถูกต้อง
+
+- ใช้ Yahoo Finance Chart API ผ่านไลบรารี Python `requests`
+- ใช้ข้อมูลราคาปิดรายวัน ไม่ใช่ราคาสดระหว่างวัน
+- การสร้างข้อมูลย้อนหลังเริ่มต้นจะดึงข้อมูลเป็นช่วงละ 5 ปี (5-year chunks)
+- ในการทำงานปกติจะดึงข้อมูลย้อนหลังประมาณ 5 ปีล่าสุด และใช้ ATH ที่บันทึกไว้ในไฟล์สถานะร่วมด้วย
+- ต้องมีข้อมูลย้อนหลังเพียงพอสำหรับการคำนวณ 52 สัปดาห์
+- หากข้อมูลล่าสุดเก่ากว่าวันปัจจุบันเกิน 7 วัน ระบบจะถือว่าข้อมูลล้าสมัยและแจ้งข้อผิดพลาด
+- หากดัชนีใดตรวจสอบไม่สำเร็จ Workflow จะรายงานความผิดพลาดใน Logs และไม่ถือว่ารอบนั้นสำเร็จ
+
+Yahoo Finance เป็นแหล่งข้อมูลภายนอกที่ไม่ใช่ API อย่างเป็นทางการสำหรับการใช้งานนี้ รูปแบบ Symbol ความพร้อมใช้งาน และประวัติข้อมูลอาจเปลี่ยนแปลงได้
+
+## 6. ปุ่มเปิดกราฟ TradingView ใน ntfy
+
+เมื่อเป็นการแจ้งเตือนจากเงื่อนไขดัชนี ระบบจะแนบ Action แยกชื่อ **Open TradingView** เพื่อเปิดกราฟของดัชนีนั้นโดยตรง
+
+ปุ่ม Action แยกจากการแตะตัวข้อความแจ้งเตือน เพื่อให้ผู้ใช้เปิดกราฟเมื่อกดปุ่มเท่านั้น
+
+ลิงก์กราฟถูกกำหนดแยกตามดัชนีทั้ง 8 ตัวในไฟล์ `scripts/run_index_alerts.py`
+
+## 7. การตั้งค่าเริ่มต้น / Secrets
+
+### ตั้งค่า ntfy
+
+1. ติดตั้งแอป ntfy บนโทรศัพท์หรือแท็บเล็ต
+2. สร้างหรือเลือก Topic ที่ต้องการรับการแจ้งเตือนที่ [ntfy.sh](https://ntfy.sh)
+3. สมัครรับ Topic เดียวกันในแอป ntfy
+4. ควรตั้งชื่อ Topic ให้เดายาก และเก็บชื่อไว้เป็นความลับ หรือใช้ระบบ Authentication ตามความเหมาะสม
+
+**ข้อควรระวัง:** Topic แบบสาธารณะของ ntfy ไม่ใช่ช่องทางส่วนตัว ผู้ที่ทราบชื่อ Topic อาจสมัครรับข้อความได้
+
+### เพิ่ม GitHub Secrets
+
+เข้า Repository → **Settings → Secrets and variables → Actions → New repository secret**
+
+เพิ่มค่า:
+
+| ชื่อ Secret | ใช้สำหรับ |
+|---|---|
+| `NTFY_TOPIC` | ชื่อ Topic ที่ใช้ส่งข้อความ (จำเป็น) |
+| `NTFY_TOKEN` | Access Token สำหรับ Topic ที่ต้องยืนยันตัวตน (ไม่จำเป็น หากไม่ได้ใช้ Authentication) |
+
+ห้ามใส่ Token ลงในไฟล์โค้ดหรือ Commit ลง Repository
+
+### สิทธิ์ Workflow
+
+เข้า Repository → **Settings → Actions → General → Workflow permissions**
+
+เลือก **Read and write permissions** แล้วกด Save เพื่อให้ GitHub Actions สามารถ Commit ไฟล์ `data/alert_state.json` กลับเข้า Repository ได้
+
+## 8. วิธีทดสอบระบบด้วยตนเอง
+
+1. เปิด Repository แล้วเลือกแท็บ **Actions**
+2. เลือก Workflow ชื่อ **Index alerts**
+3. กด **Run workflow**
+4. ระบบจะส่งข้อความทดสอบไปยัง ntfy ก่อน จากนั้นจึงเริ่มตรวจสอบดัชนีทั้ง 8 ตัว
+5. กลับไปดูหน้า Actions และเปิดรายการ Run ล่าสุด เพื่อตรวจสอบ Logs
+
+ข้อความทดสอบ ntfy ยืนยันเพียงว่าระบบส่งข้อความถึง ntfy ได้ ไม่ได้หมายความว่ามีดัชนีเข้าเงื่อนไขแจ้งเตือนในวันนั้น
+
+หากไม่มีข้อความแจ้งเตือนดัชนีเพิ่มเติม อาจเป็นเพราะยังไม่มีดัชนีใดข้ามระดับที่กำหนด
+
+## 9. โครงสร้างไฟล์สำคัญ
+
+```text
+.
+├── .github/
+│   └── workflows/
+│       └── test-yahoo-data.yml   # ตั้งเวลาและควบคุม GitHub Actions
+├── data/
+│   └── alert_state.json          # เก็บสถานะการแจ้งเตือน
+├── scripts/
+│   └── run_index_alerts.py       # ดึงข้อมูล คำนวณ และส่งแจ้งเตือน
+├── requirements.txt              # ไลบรารี Python ที่ต้องใช้
+└── README.md                     # เอกสารอธิบายโปรเจกต์
+```
+
+## 10. ข้อจำกัดที่ควรทราบ
+
+- ระบบอาศัยข้อมูลจาก Yahoo Finance ซึ่งอาจมีความล่าช้า ข้อมูลขาดหาย หรือเปลี่ยนแปลงได้
+- เป็นระบบแจ้งเตือนจากราคาปิดรายวัน ไม่ใช่ระบบ Real-time
+- GitHub Actions เป็นบริการตั้งเวลาทำงาน ไม่รับประกันว่าจะเริ่มตรงเวลาที่กำหนดทุกครั้ง
+- การแจ้งเตือนเป็นเพียงข้อมูลประกอบการติดตามตลาด ไม่ใช่คำแนะนำในการลงทุน
+- อย่าเปิดเผยชื่อ Topic หรือ Token ของ ntfy ต่อสาธารณะ
