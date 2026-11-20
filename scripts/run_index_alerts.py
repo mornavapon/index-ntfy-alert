@@ -228,7 +228,6 @@ def load_state():
 
     state.setdefault("indices", {})
     state.setdefault("assets", {})
-    state.setdefault("assets", {})
     return state
 
 
