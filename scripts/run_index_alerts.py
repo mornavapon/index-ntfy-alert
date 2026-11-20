@@ -22,6 +22,12 @@ INDICES = {
     "^NSEI": "NIFTY 50",
 }
 
+# สินทรัพย์อื่นที่ติดตามด้วยระบบแจ้งเตือนเดียวกัน
+ASSETS = {
+    "THB=X": "USD/THB (บาทต่อดอลลาร์)",
+    "DX-Y.NYB": "US Dollar Index (DXY)",
+}
+
 # ปีเริ่มต้นสำหรับค้นหาจุดสูงสุดย้อนหลัง
 HISTORY_START_YEARS = {
     "^GSPC": 1970,
@@ -32,6 +38,11 @@ HISTORY_START_YEARS = {
     "^KS11": 1980,
     "^TWII": 1990,
     "^NSEI": 1990,
+}
+
+ASSET_HISTORY_START_YEARS = {
+    "THB=X": 2000,
+    "DX-Y.NYB": 1986,
 }
 
 BASE_URL = "https://query1.finance.yahoo.com/v8/finance/chart/{}"
@@ -52,6 +63,8 @@ TRADINGVIEW_URLS = {
     "^KS11": "https://www.tradingview.com/chart/?symbol=KRX%3AKOSPI",
     "^TWII": "https://www.tradingview.com/chart/?symbol=TWSE%3ATAIEX",
     "^NSEI": "https://www.tradingview.com/chart/?symbol=NSE%3ANIFTY",
+    "THB=X": "https://www.tradingview.com/chart/?symbol=FX_IDC%3AUSDTHB",
+    "DX-Y.NYB": "https://www.tradingview.com/chart/?symbol=TVC%3ADXY",
 }
 
 RECENT_DAYS = 5 * 366
@@ -226,6 +239,7 @@ def load_state():
 
     state.setdefault("indices", {})
     state.setdefault("assets", {})
+    state.setdefault("assets", {})
     return state
 
 
@@ -271,9 +285,13 @@ def threshold_flags(drawdown):
     }
 
 
-def process_index(session, topic, token, state, symbol, name):
-    start_year = HISTORY_START_YEARS[symbol]
-    saved = state["indices"].get(symbol, {})
+def process_index(
+    session, topic, token, state, symbol, name,
+    start_year=None, bucket="indices", alert_title="Index Alert",
+):
+    if start_year is None:
+        start_year = HISTORY_START_YEARS[symbol]
+    saved = state[bucket].get(symbol, {})
 
     needs_baseline = (
         not saved.get("initialized", False)
@@ -347,7 +365,7 @@ def process_index(session, topic, token, state, symbol, name):
                     session,
                     topic,
                     token,
-                    "Index Alert",
+                    alert_title,
                     f"{name}: ราคาปิดลดลง {dd_ath:.2f}% "
                     f"จากจุดสูงสุดที่พบตั้งแต่ {start_year} "
                     f"({ath_close:.2f})\n"
@@ -362,7 +380,7 @@ def process_index(session, topic, token, state, symbol, name):
                     session,
                     topic,
                     token,
-                    "Index Alert",
+                    alert_title,
                     f"{name}: ราคาปิดลดลง {dd_52w:.2f}% "
                     f"จากจุดสูงสุด 52 สัปดาห์ ({high_52w:.2f})\n"
                     f"วันที่ข้อมูล: {latest_date}\n"
@@ -415,7 +433,7 @@ def process_index(session, topic, token, state, symbol, name):
         saved["last_52w_low_check_date"] = latest_date
 
     # บันทึกสถานะล่าสุดทุกครั้ง เพื่อให้ตรวจการข้ามระดับในรอบถัดไป
-    state["indices"][symbol] = {
+    state[bucket][symbol] = {
         "initialized": True,
         "ath_start_year": start_year,
         "ath_close": ath_close,
@@ -567,9 +585,13 @@ def main():
 
     print("Index Alert starting")
     print(f"UTC time: {now_utc().isoformat()}")
+    state.setdefault("assets", {})
     print("Monitoring 8 stock indices:")
     for symbol, name in INDICES.items():
         print(f"  {name}: {symbol}")
+    print("Additional assets (isolated state):")
+    for symbol, name in ASSETS.items():
+        print(f"  {name}: {symbol} (baseline from {ASSET_HISTORY_START_YEARS[symbol]})")
     print("Historical baseline years:")
     for symbol, name in INDICES.items():
         print(f"  {name}: from {HISTORY_START_YEARS[symbol]}")
@@ -607,6 +629,19 @@ def main():
             except Exception as exc:
                 asset_failures += 1
                 print(f"FAIL | ASSET | {name} ({symbol}) | {exc}")
+            time.sleep(1)
+
+        for symbol, name in ASSETS.items():
+            try:
+                process_index(
+                    session, topic, token, state, symbol, name,
+                    start_year=ASSET_HISTORY_START_YEARS[symbol],
+                    bucket="assets", alert_title="Market Asset Alert",
+                )
+            except Exception as exc:
+                failures += 1
+                print(f"FAIL | {name} ({symbol}) | {exc}")
+
             time.sleep(1)
 
     save_state(state)
