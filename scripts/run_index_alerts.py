@@ -290,6 +290,9 @@ def process_index(session, topic, token, state, symbol, name):
     high_52w_date, high_52w = max(
         previous_window, key=lambda item: item[1]
     )
+    low_52w_date, low_52w = min(
+        previous_window, key=lambda item: item[1]
+    )
 
     dd_ath = (latest_close / ath_close - 1) * 100
     dd_52w = (latest_close / high_52w - 1) * 100
@@ -301,6 +304,8 @@ def process_index(session, topic, token, state, symbol, name):
         f"{ath_close:.2f} ({ath_date}) "
         f"| previous 52-week high={high_52w:.2f} "
         f"({high_52w_date}) "
+        f"| previous 52-week low={low_52w:.2f} "
+        f"({low_52w_date}) "
         f"| drawdown={dd_ath:.2f}% / {dd_52w:.2f}%"
     )
 
@@ -365,6 +370,28 @@ def process_index(session, topic, token, state, symbol, name):
             action_url=TRADINGVIEW_URLS[symbol],
         )
 
+    # แจ้งเตือนเมื่อราคาปิดทำจุดต่ำสุดใหม่ในรอบ 52 สัปดาห์
+    if (
+        not is_baseline_run
+        and is_new_trading_day
+        and latest_close < low_52w
+    ):
+        send_ntfy(
+            session,
+            topic,
+            token,
+            "Index Alert",
+            f"{name}: ทำจุดต่ำสุดใหม่ในรอบ 52 สัปดาห์\\n"
+            f"ราคาปิด: {latest_close:.2f}\\n"
+            f"ต่ำกว่าจุดต่ำสุดเดิม ({low_52w:.2f}) "
+            f"วันที่ {low_52w_date}\\n"
+            f"วันที่ข้อมูล: {latest_date}",
+            priority="high",
+            action_url=TRADINGVIEW_URLS[symbol],
+        )
+        saved["last_52w_low_alert_date"] = latest_date
+        saved["last_52w_low_alert_close"] = latest_close
+
     # บันทึกสถานะล่าสุดทุกครั้ง เพื่อให้ตรวจการข้ามระดับในรอบถัดไป
     state["indices"][symbol] = {
         "initialized": True,
@@ -375,6 +402,8 @@ def process_index(session, topic, token, state, symbol, name):
         "last_close": latest_close,
         "ath_alerts": new_ath_flags,
         "52w_alerts": new_52w_flags,
+        "last_52w_low_alert_date": saved.get("last_52w_low_alert_date"),
+        "last_52w_low_alert_close": saved.get("last_52w_low_alert_close"),
         "updated_utc": now_utc().isoformat(),
     }
 
