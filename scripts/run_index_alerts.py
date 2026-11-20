@@ -22,12 +22,6 @@ INDICES = {
     "^NSEI": "NIFTY 50",
 }
 
-# สินทรัพย์อื่นที่ติดตามด้วยระบบแจ้งเตือนเดียวกัน
-ASSETS = {
-    "THB=X": "USD/THB (บาทต่อดอลลาร์)",
-    "DX-Y.NYB": "US Dollar Index (DXY)",
-}
-
 # ปีเริ่มต้นสำหรับค้นหาจุดสูงสุดย้อนหลัง
 HISTORY_START_YEARS = {
     "^GSPC": 1970,
@@ -38,11 +32,6 @@ HISTORY_START_YEARS = {
     "^KS11": 1980,
     "^TWII": 1990,
     "^NSEI": 1990,
-}
-
-ASSET_HISTORY_START_YEARS = {
-    "THB=X": 2000,
-    "DX-Y.NYB": 1986,
 }
 
 BASE_URL = "https://query1.finance.yahoo.com/v8/finance/chart/{}"
@@ -629,19 +618,6 @@ def main():
             except Exception as exc:
                 asset_failures += 1
                 print(f"FAIL | ASSET | {name} ({symbol}) | {exc}")
-            time.sleep(1)
-
-        for symbol, name in ASSETS.items():
-            try:
-                process_index(
-                    session, topic, token, state, symbol, name,
-                    start_year=ASSET_HISTORY_START_YEARS[symbol],
-                    bucket="assets", alert_title="Market Asset Alert",
-                )
-            except Exception as exc:
-                failures += 1
-                print(f"FAIL | {name} ({symbol}) | {exc}")
-
             time.sleep(1)
 
     save_state(state)
